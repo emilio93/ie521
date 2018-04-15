@@ -1,5 +1,5 @@
-#ifndef CLASS_CACHE_LRU
-#define CLASS_CACHE_LRU
+#ifndef CLASS_CACHE_NRU
+#define CLASS_CACHE_NRU
 
 #include <iostream>
 #include <iterator>
@@ -9,13 +9,17 @@
 
 #include "Cache/Cache.hh"
 
-class CacheLRU : public Cache {
+class CacheNRU : public Cache {
  public:
   //! Runs the tests on the cache with the given parameters and assign results.
   void runTest();
-  explicit CacheLRU(unsigned int size, unsigned int associativity,
+  explicit CacheNRU(unsigned int size, unsigned int associativity,
                     unsigned int blockSize, CacheRP cacheRP,
                     unsigned int missPenalty);
+
+  static Cache* makeCache(unsigned int size, unsigned int associativity,
+                          unsigned int blockSize, CacheRP cacheRP,
+                          unsigned int missPenalty);
 };
 
 #endif

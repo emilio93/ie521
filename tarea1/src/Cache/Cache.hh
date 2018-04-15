@@ -10,6 +10,7 @@
 #include "Cache/CacheRP.hh"
 #include "TraceLine/TraceLine.hh"
 class CacheLRU;
+class CacheNRU;
 
 class Cache {
  protected:
@@ -83,7 +84,11 @@ class Cache {
   //! Runs the tests on the cache with the given parameters and assign results.
   virtual void runTest() = 0;
 
-  static Cache *makeCache(CacheRP cacheRP);
+  std::string toString();
+
+  static Cache *makeCache(unsigned int size, unsigned int associativity,
+                          unsigned int blockSize, CacheRP cacheRP,
+                          unsigned int missPenalty);
 };
 
 #endif
