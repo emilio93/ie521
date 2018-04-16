@@ -14,6 +14,7 @@ class TraceLine {
   virtual int getLS() = 0;
   virtual long int getDireccion() = 0;
   virtual int getIC() = 0;
+  virtual void update(std::string line) = 0;
 
   static TraceLine *makeTraceLine(std::string traceLineStr);
 };

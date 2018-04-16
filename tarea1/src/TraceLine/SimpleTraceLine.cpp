@@ -22,15 +22,15 @@ TraceLine* SimpleTraceLine::parse(std::string line) {
   long int Direccion;
   int IC;
 
-  std::vector<std::string> items;
+  std::vector<std::string>* items;
   if (Util::isRegexMatch(line, SimpleTraceLine::getRe())) {
     items = Util::regexMatches(line, SimpleTraceLine::getRe());
   }
 
   try {
-    LS = std::stoi(items.at(0));
-    Direccion = std::stoul(items.at(1), 0, 16);
-    IC = std::stoi(items.at(2));
+    LS = std::stoi(items->at(0));
+    Direccion = std::stoul(items->at(1), 0, 16);
+    IC = std::stoi(items->at(2));
   } catch (std::invalid_argument& e) {
     std::cout << "std::invalid_argument what : " << e.what() << std::endl;
     return NULL;
@@ -38,10 +38,23 @@ TraceLine* SimpleTraceLine::parse(std::string line) {
   TraceLine* traceLine = new SimpleTraceLine(LS, Direccion, IC);
   return traceLine;
 }
+
 SimpleTraceLine::SimpleTraceLine(int LS, long int Direccion, int IC) {
   this->setLS(LS);
   this->setDireccion(Direccion);
   this->setIC(IC);
+};
+
+void SimpleTraceLine::update(std::string line) {
+  std::vector<std::string>* items =
+      Util::regexMatches(line, SimpleTraceLine::getRe());
+  // assume all the lines are a match after initialization
+  // if (Util::isRegexMatch(line, SimpleTraceLine::getRe())) {
+  // items = Util::regexMatches(line, SimpleTraceLine::getRe());
+  // }
+  this->setLS(std::stoi(items->at(0)));
+  this->setDireccion(std::stoul(items->at(1), 0, 16));
+  this->setIC(std::stoi(items->at(2)));
 }
 
 int SimpleTraceLine::getLS() { return this->LS; }

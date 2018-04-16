@@ -51,6 +51,9 @@ StdTraceLine::StdTraceLine(long int Uop,                // 32 bit decimal
   this->setMicroOpcode(MicroOpcode);
 }
 
+void actualizarCampos(std::string line);
+
+
 TraceLine* StdTraceLine::parse(std::string line) {
   long int Uop;
   long long pc;
@@ -67,58 +70,58 @@ TraceLine* StdTraceLine::parse(std::string line) {
   std::string MacroOpcode;
   std::string MicroOpcode;
 
-  std::vector<std::string> items;
+  std::vector<std::string> *items;
   if (Util::isRegexMatch(line, StdTraceLine::getRe())) {
     items = Util::regexMatches(line, StdTraceLine::getRe());
   }
 
   try {
-    Uop = std::stol(items.at(0));
+    Uop = std::stol(items->at(0));
 
     // item is in base-16
-    pc = std::stoull(items.at(1), 0, 16);
+    pc = std::stoull(items->at(1), 0, 16);
 
-    Src1 = std::stol(items.at(2));
+    Src1 = std::stol(items->at(2));
 
-    Src2 = std::stol(items.at(3));
+    Src2 = std::stol(items->at(3));
 
-    Dest = std::stol(items.at(4));
+    Dest = std::stol(items->at(4));
 
     // using ASCII
     // Possible values   representation(val & 0b11)>>6
     // 2D 00101101 -     01 -> 1
     // 52 01010010 R     10 -> 2
     // 57 01010111 W     11 -> 3
-    // short int Flags = (items.at(5).at(0) & 0b11);
-    Flags = items.at(5).at(0);
+    // short int Flags = (items->at(5).at(0) & 0b11);
+    Flags = items->at(5).at(0);
 
     // using ASCII
     // Possible values   representation(val & 0b11)>>6
     // 2D 00101101 -     01 -> 1
     // 4E 01001110 N     10 -> 2
     // 54 01010100 T     00 -> 0
-    // short int Branch = (items.at(6).at(0) & 0b11);
-    Branch = items.at(6).at(0);
+    // short int Branch = (items->at(6).at(0) & 0b11);
+    Branch = items->at(6).at(0);
 
     // using ASCII
     // Possible values   representation(val & 0b11)
     // 2D 00101101 -     01 -> 1
     // 4C 01001100 L     10 -> 0
     // 53 01010011 S     00 -> 3
-    // int LdSt = (items.at(7).at(0) & 0b11);
-    LdSt = items.at(7).at(0);
+    // int LdSt = (items->at(7).at(0) & 0b11);
+    LdSt = items->at(7).at(0);
 
-    Immediate = std::stoll(items.at(8));
+    Immediate = std::stoll(items->at(8));
 
-    MemAddress = std::stoull(items.at(9));
+    MemAddress = std::stoull(items->at(9));
 
-    FallthroughPC = std::stoull(items.at(10));
+    FallthroughPC = std::stoull(items->at(10));
 
-    TargetPC = std::stoull(items.at(11));
+    TargetPC = std::stoull(items->at(11));
 
-    MacroOpcode = items.at(12);
+    MacroOpcode = items->at(12);
 
-    MicroOpcode = items.at(13);
+    MicroOpcode = items->at(13);
 
   } catch (std::invalid_argument& e) {
     std::cout << "std::invalid_argument what : " << e.what() << std::endl;
@@ -137,6 +140,30 @@ TraceLine* StdTraceLine::parse(std::string line) {
       FallthroughPC, TargetPC, MacroOpcode, MicroOpcode);
   return traceLine;
 };
+
+void StdTraceLine::update(std::string line) {
+  std::vector<std::string> *items;  
+  if (Util::isRegexMatch(line, StdTraceLine::getRe())) {
+    items = Util::regexMatches(line, StdTraceLine::getRe());
+  this->setUop(std::stol(items->at(0)));
+  this->setPc(std::stoull(items->at(1))); 
+  this->setSrc1(std::stol(items->at(2)));
+  this->setSrc2(std::stol(items->at(3)));
+  this->setDest(std::stol(items->at(4)));
+  this->setFlags(items->at(5).at(0));
+  this->setBranch(items->at(6).at(0));
+  this->setLdSt(items->at(7).at(0));
+  this->setImmediate(std::stoll(items->at(8)));
+  this->setMemAddress(std::stoull(items->at(9)));
+  this->setFallthroughPC(std::stoull(items->at(10)));
+  this->setTargetPC(std::stoull(items->at(11)));
+  this->setMacroOpcode(items->at(12));
+  this->setMicroOpcode(items->at(13));
+  } else {
+    throw "invalid line format";
+  }
+};
+
 
 int StdTraceLine::getLS() { return this->getLdSt() == 'S' ? 1 : 0; }
 long int StdTraceLine::getDireccion() { return this->getMemAddress(); }

@@ -50,6 +50,8 @@ class StdTraceLine : public TraceLine {
   long int getDireccion();
   int getIC();
 
+  void update(std::string line);
+
   long int getUop();
   long long getPc();
   signed long int getSrc1();

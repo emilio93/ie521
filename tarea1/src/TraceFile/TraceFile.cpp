@@ -25,12 +25,13 @@ bool TraceFile::nextLine() {
   if (!std::getline(this->in, *str)) {
     return false;
   }
-  this->line = str;
+  this->line = *str;
+  delete str;
   return true;
 }
 
 std::string TraceFile::currLine() {
-  return *this->line;
+  return this->line;
 }
 
 

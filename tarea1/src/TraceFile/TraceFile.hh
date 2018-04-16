@@ -13,7 +13,7 @@ class TraceFile {
  private:
   std::ifstream file;
   std::string filepath;
-  std::string* line;
+  std::string line;
   boost::iostreams::filtering_istream in;
 
  public:
