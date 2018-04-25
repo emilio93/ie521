@@ -3,20 +3,21 @@
 
 #include <iostream>
 #include <iterator>
+#include <map>
 #include <regex>
 #include <string>
 #include <vector>
 
-#include "Cli/CliOption.hh"
 #include "Cache/Cache.hh"
 #include "Cache/CacheRP.hh"
+#include "Cli/CliOption.hh"
 #include "TraceLine/TraceLine.hh"
 
 class CLI {
  private:
-  std::vector<std::string> args = std::vector<std::string>();
-  
-  std::map<CliOption, std::string> opts = std::map<CliOption, std::string>();
+  std::vector<std::string> args;
+
+  std::map<CliOption, std::string> opts;
 
   void getPairs();
 
