@@ -41,7 +41,7 @@ void CLI::testCli(int argc, char* argv[]) {
   std::string str = "# 0 30004a30 2";
   // clang-format on
 
-  TraceLine* traceLine = TraceLine::makeTraceLine(str);
+  TraceLine* traceLine = TraceLine::makeTraceLine(&str);
   std::cout << "LS\t\t" << traceLine->getLS() << std::endl
             << "Direccion\t" << std::hex << traceLine->getDireccion()
             << std::endl

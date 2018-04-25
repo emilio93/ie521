@@ -10,14 +10,12 @@ class SimpleTraceLine : public TraceLine {
   long int Direccion;
   int IC;
 
-  const static std::string re;
   explicit SimpleTraceLine(int LS, long int Direccion, int IC);
 
  public:
-  const static std::string getRe();
-  static TraceLine* parse(std::string line);
+  static TraceLine* parse(std::string* line);
 
-  void update(std::string line);  
+  void update(std::string* line);  
 
   int getLS();
   long int getDireccion();

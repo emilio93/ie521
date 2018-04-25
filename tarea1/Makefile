@@ -4,9 +4,11 @@ CXX ?= g++
 SRC_PATH = src
 BUILD_PATH = build
 BIN_PATH = bin
+BIN_TEST = bin
 
 # executable # 
 BIN_NAME = cache
+BIN_TEST_NAME = test
 
 # extensions #
 SRC_EXT = cpp
