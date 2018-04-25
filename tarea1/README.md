@@ -6,6 +6,7 @@ Uses zlib and libboost .
 ```
 # install zlib
 sudo apt-get install zlib1g 
+sudo apt-get install zlib1g-dev
 # install libboost_iostreams
 sudo apt-get install libboost-iostreams-dev 
 ```
