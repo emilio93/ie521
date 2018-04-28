@@ -11,8 +11,10 @@
  */
 enum CacheRP { LRU, NRU, SRRIP, RANDOM, INDEFINIDO };
 
+//! Returns the replacement policy as a string.
 std::string cacheRPToString(CacheRP opt);
 
+//! Returns the CacheRP element from a given string.
 CacheRP stringToCacheRP(std::string option);
 
 #endif

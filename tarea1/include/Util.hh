@@ -52,9 +52,9 @@ class Util {
 
   //! Returns a vector of strings with the regex matches, 'in' against regex
   //! string 're'.
-  static std::vector<std::string>* regexMatches(const std::string& in,
-                                                const std::string& re, 
-                                                std::vector<std::string>* matches) {
+  static std::vector<std::string>* regexMatches(
+      const std::string& in, const std::string& re,
+      std::vector<std::string>* matches) {
     std::vector<std::string>::iterator it;
     std::smatch m;
     std::regex_search(in, m, std::regex(re));

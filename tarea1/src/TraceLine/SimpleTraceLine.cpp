@@ -20,7 +20,7 @@ TraceLine* SimpleTraceLine::parse(std::string* line) {
 
   std::getline(iss, s, ' ');
   long int Direccion = std::stoul(s, 0, 16);
-  
+
   std::getline(iss, s, ' ');
   int IC = std::stoi(s);
 
@@ -45,7 +45,7 @@ void SimpleTraceLine::update(std::string* line) {
 
   std::getline(iss, s, ' ');
   this->setDireccion(std::stoul(s, 0, 16));
-  
+
   std::getline(iss, s, ' ');
   this->setIC(std::stoi(s));
 }

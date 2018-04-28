@@ -27,9 +27,8 @@ void TraceFile::reset() {
 }
 
 bool TraceFile::nextLine() {
-
   if (this->line != NULL) delete this->line;
-  
+
   std::string* str = new std::string();
   if (!std::getline(this->in, *str)) {
     return false;
@@ -40,16 +39,14 @@ bool TraceFile::nextLine() {
 }
 
 TraceLine* TraceFile::getTraceLine() {
-  //std::cout << this->file;
+  // std::cout << this->file;
   if (this->curTraceLine == NULL) {
-    //this->curTraceLine = TraceLine::makeTraceLine();
+    // this->curTraceLine = TraceLine::makeTraceLine();
   }
   return NULL;
 }
 
-std::string* TraceFile::currLine() {
-  return this->getLine();
-}
+std::string* TraceFile::currLine() { return this->getLine(); }
 
 void TraceFile::countLines() {
   try {
@@ -70,14 +67,14 @@ void TraceFile::countLines() {
   }
 }
 
-std::ifstream* TraceFile::getFile() {return &this->file;}
+std::ifstream* TraceFile::getFile() { return &this->file; }
 
-std::string* TraceFile::getFilepath() {return &this->filepath;}
+std::string* TraceFile::getFilepath() { return &this->filepath; }
 
-std::string* TraceFile::getLine() {return this->line;}
+std::string* TraceFile::getLine() { return this->line; }
 
-boost::iostreams::filtering_istream* TraceFile::getIn() {return &this->in;}
+boost::iostreams::filtering_istream* TraceFile::getIn() { return &this->in; }
 
-void TraceFile::setLine(std::string *line) {this->line = line;}
+void TraceFile::setLine(std::string* line) { this->line = line; }
 
-void TraceFile::setFilepath(std::string filepath) {this->filepath = filepath;}
+void TraceFile::setFilepath(std::string filepath) { this->filepath = filepath; }

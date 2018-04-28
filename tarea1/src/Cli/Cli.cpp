@@ -12,7 +12,7 @@ CLI::CLI(char* argv[]) {
 void CLI::getPairs() {
   for (unsigned int i = 1; i < this->args.size(); i++) {
     if (checkOption(stringToCliOption(this->args.at(i)))) {
-      if (i == this->args.size()-1) {
+      if (i == this->args.size() - 1) {
         std::cout << "Argumento incompleto \"" << this->args.at(i) << "\"\n";
         return;
       }
@@ -30,8 +30,7 @@ void CLI::getPairs() {
   try {
     this->getOpts().at(TRACE_FILENAME);
   } catch (std::out_of_range& e) {
-    this->opts.insert(
-    {TRACE_FILENAME, "data/art.trace.gz"});
+    this->opts.insert({TRACE_FILENAME, "data/art.trace.gz"});
   }
 
   try {
@@ -70,13 +69,13 @@ void CLI::testCli(int argc, char* argv[]) {
                          stringToCacheRP(this->getOpts().at(POLITICA_REMPLAZO)),
                          std::stoi(this->getOpts().at(MISS_PENALTY)));
   } catch (std::exception& e) {
-    std::cout << "Error " << e.what() << std::endl << "Faltan Parámetros" << std::endl;
+    std::cout << "Error " << e.what() << std::endl
+              << "Faltan Parámetros" << std::endl;
     return;
   }
 
   if (cache == NULL) return;
 
-  std::cout << std::endl << "Cache"<< std::endl;
+  std::cout << std::endl << "Cache" << std::endl;
   std::cout << cache->toString() << std::endl;
 }
-

@@ -19,7 +19,7 @@ std::string cliOptionToString(CliOption opt) {
     case MISS_PENALTY:
       option = "-mp";
       break;
-     case TRACE_FILENAME:
+    case TRACE_FILENAME:
       option = "-f";
       break;
     default:
@@ -69,7 +69,9 @@ bool isRequired(CliOption opt) {
 bool checkOption(CliOption opt) { return opt != NO_OPTION; }
 
 bool checkOptionValue(CliOption opt, std::string value) {
-  if (opt == TRACE_FILENAME) {return true;}
+  if (opt == TRACE_FILENAME) {
+    return true;
+  }
   if (opt == TAMANO_CACHE || opt == TAMANO_LINEA || opt == ASOCIATIVIDAD ||
       opt == MISS_PENALTY) {
     return Util::isInt(value);

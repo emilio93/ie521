@@ -15,7 +15,7 @@ class SimpleTraceLine final : public TraceLine {
  public:
   static TraceLine* parse(std::string* line);
 
-  void update(std::string* line);  
+  void update(std::string* line);
 
   int getLS();
   long int getDireccion();

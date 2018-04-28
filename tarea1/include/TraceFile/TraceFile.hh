@@ -20,7 +20,7 @@ class TraceFile {
   boost::iostreams::filtering_istream in;
 
   TraceLine* curTraceLine;
-  
+
   void setLine(std::string* line);
   void setFilepath(std::string filepath);
 
@@ -41,7 +41,6 @@ class TraceFile {
   std::string* getFilepath();
   std::string* getLine();
   boost::iostreams::filtering_istream* getIn();
-
 };
 
 #endif
