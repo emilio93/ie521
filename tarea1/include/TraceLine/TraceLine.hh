@@ -18,5 +18,5 @@ class TraceLine {
 
   static TraceLine* makeTraceLine(std::string* traceLineStr);
 };
- 
+
 #endif
