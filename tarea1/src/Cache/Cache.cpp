@@ -9,7 +9,7 @@ Cache* Cache::makeCache(unsigned int size, unsigned int associativity,
                         unsigned int blockSize, CacheRP cacheRP,
                         unsigned int missPenalty) {
   if (cacheRP == LRU) {
-    CacheLRU* cache =
+    Cache* cache =
         new CacheLRU(size, associativity, blockSize, cacheRP, missPenalty);
     return cache;
   } else if (cacheRP == NRU) {
@@ -27,6 +27,7 @@ std::string Cache::toString() {
 
   result += "\nAsociatividad: ";
   result += std::to_string(this->associativity);
+
   result += "\nTamaño Línea: ";
   result += std::to_string(this->blockSize);
 

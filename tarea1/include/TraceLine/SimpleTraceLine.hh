@@ -4,7 +4,7 @@
 #include <string>
 #include "TraceLine/TraceLine.hh"
 
-class SimpleTraceLine : public TraceLine {
+class SimpleTraceLine final : public TraceLine {
  private:
   int LS;
   long int Direccion;

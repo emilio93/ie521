@@ -1,7 +1,16 @@
 #include "Cli/Cli.hh"
 
+CLI::CLI(char* argv[]) {
+  unsigned i = 0;
+  while (argv[i]) {
+    i++;
+  };
+  this->args = std::vector<std::string>(argv, argv + i);
+  this->getPairs();
+}
+
 void CLI::getPairs() {
-  for (int i = 1; i < this->args.size(); i++) {
+  for (unsigned int i = 1; i < this->args.size(); i++) {
     if (checkOption(stringToCliOption(this->args.at(i)))) {
       if (i == this->args.size()-1) {
         std::cout << "Argumento incompleto \"" << this->args.at(i) << "\"\n";
@@ -15,22 +24,26 @@ void CLI::getPairs() {
       }
       this->opts.insert(
           {stringToCliOption(this->args.at(i)), this->args.at(i + 1)});
-      std::cout << "Opcion agregada \"" << this->args.at(i) << " "
-                << this->args.at(i + 1) << "\"\n";
       i++;
     }
   }
-  std::cout << std::endl;
-  return;
-}
+  try {
+    this->getOpts().at(TRACE_FILENAME);
+  } catch (std::out_of_range& e) {
+    this->opts.insert(
+    {TRACE_FILENAME, "data/art.trace.gz"});
+  }
 
-CLI::CLI(char* argv[]) {
-  unsigned i = 0;
-  while (argv[i]) {
-    i++;
-  };
-  this->args = std::vector<std::string>(argv, argv + i);
-  this->getPairs();
+  try {
+    this->getOpts().at(TAMANO_CACHE);
+    this->getOpts().at(TAMANO_LINEA);
+    this->getOpts().at(ASOCIATIVIDAD);
+    this->getOpts().at(POLITICA_REMPLAZO);
+    this->getOpts().at(MISS_PENALTY);
+  } catch (std::out_of_range& e) {
+    throw std::invalid_argument("Error: parámetros incompletos");
+  }
+  return;
 }
 
 std::map<CliOption, std::string> CLI::getOpts() { return this->opts; }

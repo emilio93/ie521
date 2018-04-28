@@ -7,6 +7,7 @@
 #include <regex>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 #include "Cache/Cache.hh"
 #include "Cache/CacheRP.hh"

@@ -19,6 +19,9 @@ std::string cliOptionToString(CliOption opt) {
     case MISS_PENALTY:
       option = "-mp";
       break;
+     case TRACE_FILENAME:
+      option = "-f";
+      break;
     default:
       option = "";
   }
@@ -37,6 +40,8 @@ CliOption stringToCliOption(std::string option) {
     opt = POLITICA_REMPLAZO;
   } else if (option.compare("-mp") == 0) {
     opt = MISS_PENALTY;
+  } else if (option.compare("-f") == 0) {
+    opt = TRACE_FILENAME;
   } else {
     opt = NO_OPTION;
   }
@@ -54,6 +59,8 @@ bool isRequired(CliOption opt) {
     case MISS_PENALTY:
       isRequired = true;
       break;
+    case TRACE_FILENAME:
+      isRequired = false;
     default:
       isRequired = false;
   }
@@ -62,6 +69,7 @@ bool isRequired(CliOption opt) {
 bool checkOption(CliOption opt) { return opt != NO_OPTION; }
 
 bool checkOptionValue(CliOption opt, std::string value) {
+  if (opt == TRACE_FILENAME) {return true;}
   if (opt == TAMANO_CACHE || opt == TAMANO_LINEA || opt == ASOCIATIVIDAD ||
       opt == MISS_PENALTY) {
     return Util::isInt(value);
