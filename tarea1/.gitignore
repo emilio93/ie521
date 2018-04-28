@@ -3,3 +3,5 @@ third-party
 data
 bin
 .vscode
+cache
+*.out
