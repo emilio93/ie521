@@ -1,4 +1,3 @@
-
 #include "Cli/CliOption.hh"
 
 std::string cliOptionToString(CliOption opt) {
