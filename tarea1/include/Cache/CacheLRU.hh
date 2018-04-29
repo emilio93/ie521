@@ -8,34 +8,20 @@
 #include <string>
 #include <vector>
 #include <set>
-
-#include <boost/bimap.hpp>
+#include <list>
+#include <random>
 
 #include "Cache/Cache.hh"
 #include "TraceFile/TraceFile.hh"
 
-struct CacheLRUInfo : public CacheInfo {
-  unsigned int lruPos;
-  CacheLRUInfo(bool db, bool v, unsigned int lruPos) : CacheInfo(db, v) {
-    this->lruPos = lruPos;
-  }
-};
-
 class CacheLRU : public Cache {
  private:
 
-  //! lruList keeps track of the cache elements with lru rp.
-  std::vector<boost::bimap<long int, long int>*>* lruList;
+  CacheInfo* readLru();
 
-  /**
-   * @brief initializes the lruList
-   *
-   */
-  void initLruList();
+  void writeLru();
 
-  void getCacheAddress();
-
-  void setCacheAddress();
+  std::vector<std::list<long int>*>* lruList;
 
  public:
   //! Constructor sets parameters of the cache and the trace File reference.

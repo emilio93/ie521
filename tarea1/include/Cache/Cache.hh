@@ -10,15 +10,13 @@
 #include <algorithm>
 #include <iterator>
 
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/dijkstra_shortest_paths.hpp>
-#include <boost/graph/graph_traits.hpp>
-
 #include "Cache/CacheRP.hh"
 #include "TraceFile/TraceFile.hh"
 #include "TraceLine/TraceLine.hh"
+
 class CacheLRU;
 class CacheNRU;
+class CacheRandom;
 
 struct CacheInfo {
   bool dirtyBit;

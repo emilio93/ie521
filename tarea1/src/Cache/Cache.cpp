@@ -4,6 +4,7 @@
 #include "Cache/Cache.hh"
 #include "Cache/CacheLRU.hh"
 #include "Cache/CacheNRU.hh"
+#include "Cache/CacheRandom.hh"
 
 Cache* Cache::makeCache(unsigned int size, unsigned int associativity,
                         unsigned int blockSize, CacheRP cacheRP,
@@ -13,8 +14,12 @@ Cache* Cache::makeCache(unsigned int size, unsigned int associativity,
         new CacheLRU(size, associativity, blockSize, cacheRP, missPenalty, tfr);
     return cache;
   } else if (cacheRP == NRU) {
-    CacheNRU* cache =
+    Cache* cache =
         new CacheNRU(size, associativity, blockSize, cacheRP, missPenalty, tfr);
+    return cache;
+  } else if (cacheRP == RANDOM) {
+    Cache* cache =
+        new CacheRandom(size, associativity, blockSize, cacheRP, missPenalty, tfr);
     return cache;
   }
   return NULL;
@@ -57,6 +62,9 @@ Cache::Cache(unsigned int size, unsigned int associativity,
 void Cache::simulate() {
   unsigned int i = 0;
   TraceLine* traceLine = TraceLine::makeTraceLine(tfr->getLine());
+
+  std::cout << "\r"
+            << "0 lineas procesadas";
   do {
     traceLine->update(tfr->getLine());
     i++;
@@ -73,15 +81,30 @@ void Cache::simulate() {
     // possible miss penalty is added later on
     this->setSimResults(this->getSimResults() + traceLine->getIC());
 
+    std::unordered_map<long int, CacheInfo*>* currSet =
+        this->cache->at(this->index);
+
     // asume we have a miss
     this->isHit = false;
 
-    try {
-      if (this->cache->at(this->index)->at(this->tag)->valid) {
-        this->isHit = true;
+    // hit
+    if ((currSet->find(this->tag) != currSet->end()) &&
+        currSet->at(this->tag)->valid) {
+      this->isHit = true;
+      if (traceLine->getLS() == 0) { // load
+        this->setLoadHits(this->getLoadHits() + 1);
+      } else { // store
+        this->setStoreHits(this->getStoreHits() + 1);
+        currSet->at(this->tag)->dirtyBit = 1;
       }
-    } catch (const std::out_of_range& e) {
-      this->isHit = false;
+    } else { // miss
+      // this->isHit = false;
+      if (traceLine->getLS() == 0) {
+        this->setLoadMisses(this->getLoadMisses() + 1);
+      } else {
+        this->setStoreMisses(this->getStoreMisses() + 1);
+
+      }
     }
 
     // update counters if hit
@@ -105,12 +128,20 @@ void Cache::simulate() {
 
     // replacement policy processing
     this->access(traceLine);
-    if (i%50000 == 0) std::cout << i << std::endl;
+    if (i % 10000 == 0) {
+      std::cout << "\r" << std::to_string(i) << " lineas procesadas";
+      std::cout.flush();
+    }
     // if (i == 50000) break;
   } while (tfr->nextLine());
+  std::cout << "\r" << std::to_string(i) << " lineas procesadas";
+  std::cout << std::endl;
 
-  this->setAvgMemAccessTime(this->getSimResults()/this->getInstructions());
-  this->setCpuTime(0);
+  this->setAvgMemAccessTime((float)this->getSimResults() /
+                            (float)this->getInstructions());
+  this->setMissRate((float)this->getTotalMisses() /
+                    (float)this->getMemAccesses());
+  this->setRdMissRate((float)(this->getLoadMisses())/(float)(this->getLoadMisses() + this->getLoadHits()));
 
   delete traceLine;
   traceLine = NULL;
@@ -118,8 +149,7 @@ void Cache::simulate() {
 
 void Cache::setAddressMasks() {
   this->offsetBits = std::ceil(std::log2(this->getBlockSize()));
-  this->indexBits =
-      std::ceil(std::log2(this->getAssociativity()));
+  this->indexBits = std::ceil(std::log2(this->getAssociativity()));
   this->tagBits = Cache::ADDRESS_LENGTH - (this->offsetBits + this->indexBits);
 
   this->offsetMask = std::exp2(offsetBits) - 1;
@@ -155,7 +185,6 @@ void Cache::mapAddress(TraceLine* traceLine) {
       (this->indexMask & traceLine->getDireccion()) >> this->offsetBits;
   this->tag = (this->tagMask & traceLine->getDireccion()) >>
               (this->offsetBits + this->indexBits);
-
 }
 
 void Cache::setTfr(TraceFile* tfr) { this->tfr = tfr; }

@@ -1,6 +1,3 @@
-
-#include <string>
-
 #include "Cache/CacheNRU.hh"
 
 CacheNRU::CacheNRU(unsigned int size, unsigned int associativity,
