@@ -18,8 +18,8 @@ Cache* Cache::makeCache(unsigned int size, unsigned int associativity,
         new CacheNRU(size, associativity, blockSize, cacheRP, missPenalty, tfr);
     return cache;
   } else if (cacheRP == RANDOM) {
-    Cache* cache =
-        new CacheRandom(size, associativity, blockSize, cacheRP, missPenalty, tfr);
+    Cache* cache = new CacheRandom(size, associativity, blockSize, cacheRP,
+                                   missPenalty, tfr);
     return cache;
   }
   return NULL;
@@ -91,33 +91,14 @@ void Cache::simulate() {
     if ((currSet->find(this->tag) != currSet->end()) &&
         currSet->at(this->tag)->valid) {
       this->isHit = true;
-      if (traceLine->getLS() == 0) { // load
+      if (traceLine->getLS() == 0) {  // load
         this->setLoadHits(this->getLoadHits() + 1);
-      } else { // store
+      } else {  // store
         this->setStoreHits(this->getStoreHits() + 1);
         currSet->at(this->tag)->dirtyBit = 1;
       }
-    } else { // miss
+    } else {  // miss
       // this->isHit = false;
-      if (traceLine->getLS() == 0) {
-        this->setLoadMisses(this->getLoadMisses() + 1);
-      } else {
-        this->setStoreMisses(this->getStoreMisses() + 1);
-
-      }
-    }
-
-    // update counters if hit
-    if (this->isHit) {
-      this->setTotalHits(this->getTotalHits() + 1);
-      if (traceLine->getLS() == 0) {
-        this->setLoadHits(this->getLoadHits() + 1);
-      } else {
-        this->setStoreHits(this->getStoreHits() + 1);
-      }
-    } else {
-      this->setTotalMisses(this->getTotalMisses() + 1);
-      // increace total cycles with miss penalty
       this->setSimResults(this->getSimResults() + this->getMissPenalty());
       if (traceLine->getLS() == 0) {
         this->setLoadMisses(this->getLoadMisses() + 1);
@@ -137,11 +118,15 @@ void Cache::simulate() {
   std::cout << "\r" << std::to_string(i) << " lineas procesadas";
   std::cout << std::endl;
 
+  this->setTotalHits(this->getLoadHits() + this->getStoreHits());
+  this->setTotalMisses(this->getLoadMisses() + this->getStoreMisses());
+
   this->setAvgMemAccessTime((float)this->getSimResults() /
                             (float)this->getInstructions());
   this->setMissRate((float)this->getTotalMisses() /
                     (float)this->getMemAccesses());
-  this->setRdMissRate((float)(this->getLoadMisses())/(float)(this->getLoadMisses() + this->getLoadHits()));
+  this->setRdMissRate((float)(this->getLoadMisses()) /
+                      (float)(this->getLoadMisses() + this->getLoadHits()));
 
   delete traceLine;
   traceLine = NULL;
