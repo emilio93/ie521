@@ -2,8 +2,6 @@
 #include <string>
 #include <sstream>
 
-#include <boost/algorithm/string/split.hpp>
-
 #include "TraceLine/SimpleTraceLine.hh"
 #include "TraceLine/TraceLine.hh"
 #include "Util.hh"
