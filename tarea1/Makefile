@@ -6,7 +6,7 @@ BUILD_PATH = build
 BIN_PATH = bin
 BIN_TEST = bin
 
-# executable # 
+# executable #
 BIN_NAME = cache
 BIN_TEST_NAME = test
 
@@ -24,7 +24,7 @@ OBJECTS = $(SOURCES:$(SRC_PATH)/%.$(SRC_EXT)=$(BUILD_PATH)/%.o)
 DEPS = $(OBJECTS:.o=.d)
 
 # flags #
-COMPILE_FLAGS = -std=c++11 -Wall -g -Wextra -ggdb3 -pg
+COMPILE_FLAGS = -std=c++17 -Wall -g -Wextra -ggdb3 -pg
 INCLUDES = -Iinclude/ -Iinclude/Cache -I/usr/local/include
 # Space-separated pkg-config libraries used by this project
 LIBS = -lboost_iostreams -lz
