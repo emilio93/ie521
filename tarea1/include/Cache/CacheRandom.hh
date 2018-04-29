@@ -16,8 +16,10 @@
 class CacheRandom : public Cache {
  private:
   std::random_device r;
-  std::default_random_engine randEl;               // e1(r());
-  std::uniform_int_distribution<int> uniformDist;  // (1, 6);
+  std::default_random_engine randEl;
+
+  //! Provides random number generation.
+  std::uniform_int_distribution<int> uniformDist;
 
  public:
   //! Runs the tests on the cache with the given parameters and assign results.
@@ -25,6 +27,7 @@ class CacheRandom : public Cache {
                     unsigned int blockSize, CacheRP cacheRP,
                     unsigned int missPenalty, TraceFile* tfr);
 
+  //! Single memory access implemented to satisfy random rp.
   void access(TraceLine* traceLine);
 };
 
