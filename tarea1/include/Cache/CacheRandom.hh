@@ -10,10 +10,10 @@
 #include "Cache/Cache.hh"
 #include "TraceFile/TraceFile.hh"
 
-class CacheNRU : public Cache {
+class CacheRandom : public Cache {
  public:
   //! Runs the tests on the cache with the given parameters and assign results.
-  explicit CacheNRU(unsigned int size, unsigned int associativity,
+  explicit CacheRandom(unsigned int size, unsigned int associativity,
                     unsigned int blockSize, CacheRP cacheRP,
                     unsigned int missPenalty, TraceFile* tfr);
 

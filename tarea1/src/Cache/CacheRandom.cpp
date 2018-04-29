@@ -1,15 +1,15 @@
 
 #include <string>
 
-#include "Cache/CacheNRU.hh"
+#include "Cache/CacheRandom.hh"
 
-CacheNRU::CacheNRU(unsigned int size, unsigned int associativity,
+CacheRandom::CacheRandom(unsigned int size, unsigned int associativity,
                    unsigned int blockSize, CacheRP cacheRP,
                    unsigned int missPenalty, TraceFile* tfr)
     : Cache(size, associativity, blockSize, cacheRP, missPenalty, tfr) {
 
 };
 
-void CacheNRU::access(TraceLine* traceLine){
+void CacheRandom::access(TraceLine* traceLine){
 
 };

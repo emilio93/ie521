@@ -1,96 +1,339 @@
 #ifndef ABSTRACT_CLASS_CACHE
 #define ABSTRACT_CLASS_CACHE
 
+#include <cmath>
 #include <iostream>
 #include <iterator>
 #include <regex>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <iterator>
+
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/dijkstra_shortest_paths.hpp>
+#include <boost/graph/graph_traits.hpp>
 
 #include "Cache/CacheRP.hh"
+#include "TraceFile/TraceFile.hh"
 #include "TraceLine/TraceLine.hh"
 class CacheLRU;
 class CacheNRU;
 
+struct CacheInfo {
+  bool dirtyBit;
+  bool valid;
+  CacheInfo(bool db, bool v) {
+    this->dirtyBit = db;
+    this->valid = v;
+  }
+};
+
 class Cache {
  protected:
-  //! Vector of actions done on the cache is the representation of the Trace.
-  std::vector<TraceLine> TraceLines;
+  // Address length in bits
+  static const int ADDRESS_LENGTH = 32;
 
+  /**
+   * @brief file to read the mem accesses from
+   *
+   */
+  TraceFile* tfr;
+
+  // -------------------------------------------
   // CACHE PROPERTIES
+  // -------------------------------------------
 
-  //! Size of the cache.
+  /**
+   * @brief Size of the cache
+   *
+   */
   unsigned int size;
 
-  //! Assicuativity of the cache.
+  /**
+   * @brief Assicuativity of the cache
+   *
+   */
   unsigned int associativity;
 
-  //! Block size of the cache.
+  /**
+   * @brief Block size of the cache
+   *
+   */
   unsigned int blockSize;
 
-  //! Replacement Policy of the cache.
+  /**
+   * @brief Replacement Policy of the cache
+   *
+   */
   CacheRP cacheRP;
 
-  //! Penalty cycles when a miss occurs.
+  /**
+   * @brief Penalty cycles when a miss occurs
+   *
+   */
   unsigned int missPenalty;
 
-  // RESULTS
+  /**
+   * @brief Cache lines
+   *
+   */
+  unsigned int cacheLines;
 
-  //! Simulation results: heightExecution time(cycles)
+  // -------------------------------------------
+  // SIMULATION RESULTS
+  // -------------------------------------------
+
+  /**
+   * @brief Simulation results: heightExecution time(cycles)
+   *
+   */
   unsigned int simResults;
 
-  //! Instructions
+  /**
+   * @brief Instructions
+   *
+   */
   unsigned int instructions;
 
-  //! Memory accesses
+  /**
+   * @brief Memory accesses
+   *
+   */
   unsigned int memAccesses;
 
-  //! Overall miss rate
+  /**
+   * @brief Overall miss rate
+   *
+   */
   float missRate;
 
-  //! Read miss rate
+  /**
+   * @brief Read miss rate
+   *
+   */
   float RdMissRate;
 
-  //! CPU time (cycles):
+  /**
+   * @brief CPU time (cycles)
+   *
+   */
   float cpuTime;
 
-  //! Average memory access time (cycles):
+  /**
+   * @brief Average memory access time (cycles)
+   *
+   */
   float avgMemAccessTime;
 
-  //! Dirty evictions:
+  /**
+   * @brief Dirty evictions
+   *
+   */
   unsigned int dirtyEvictions;
 
-  // Load misses:
+  /**
+   * @brief Load misses
+   *
+   */
   unsigned int loadMisses;
 
-  // Store misses:
+  /**
+   * @brief Store misses
+   *
+   */
   unsigned int storeMisses;
 
-  // Total misses:
+  /**
+   * @brief Total misses
+   *
+   */
   unsigned int totalMisses;
 
-  // Load hits:
+  /**
+   * @brief Load hits
+   *
+   */
   unsigned int loadHits;
 
-  // Store hits:
+  /**
+   * @brief Store hits
+   *
+   */
   unsigned int storeHits;
 
-  // Total hits:
+  /**
+   * @brief Total hits
+   *
+   */
   unsigned int totalHits;
 
+  // -------------------------------------------
+  // ADDRESS PARTS
+  // -------------------------------------------
+
+  /**
+   * @brief tag mask to extract tag from address.
+   *
+   */
+  long int tagMask;
+
+  /**
+   * @brief index mask to extract index from address.
+   *
+   */
+  long int indexMask;
+
+  /**
+   * @brief offset mask to extract offset from address.
+   *
+   */
+  long int offsetMask;
+
+  /**
+   * @brief Quantity of bits for the offset
+   *
+   */
+  int offsetBits;
+
+  /**
+   * @brief Quantity of bits for the index
+   *
+   */
+  int indexBits;
+
+  /**
+   * @brief Quantity of bits for the tag
+   *
+   */
+  int tagBits;
+
+  // CURRENT STATE
+
+  /**
+   * @breif Current address tag
+   *
+   */
+  long int tag;
+
+  /**
+   * @breif Current address index
+   *
+   */
+  long int index;
+
+  /**
+   * @breif Current address offset
+   *
+   */
+  long int offset;
+
+  /**
+   * @brief Indicates if current access is a hit
+   *
+   */
+  bool isHit;
+
+  /**
+   * @breif cache mem stores tags. Sets of lines
+   * access as this->cache->at(setNo)->at(lineNo)
+   *
+   */
+  std::vector<std::unordered_map<long int, CacheInfo*>*>* cache;
+
+  /**
+   * @brief Construct a new Cache object
+   *
+   * @param size size of the cache
+   * @param associativity associativity of the cache
+   * @param blockSize cache block size
+   * @param cacheRP cache replacement policy
+   * @param missPenalty cache miss penalty
+   * @param tfr trace file to simulate
+   */
+  Cache(unsigned int size, unsigned int associativity, unsigned int blockSize,
+        CacheRP cacheRP, unsigned int missPenalty, TraceFile* tfr);
+
  public:
+  /**
+   * @brief Destroy the Cache object
+   *
+   */
   ~Cache() { ; }
 
-  //! Runs the tests on the cache with the given parameters and assign results.
-  virtual void runTest() = 0;
+  /**
+   * @breif Runs the tests on the cache with the given parameters and assign
+   * results
+   *
+   */
+  virtual void access(TraceLine* traceLine) = 0;
 
+  /**
+   * @brief Initialize cache representation as a vector of vectors(sets of
+   * lines)
+   *
+   */
+  void initCache();
+
+  /**
+   * @brief run simulation of the trace file on the current cache
+   *
+   */
+  void simulate();
+
+  /**
+   * @brief Returns cache info as a string
+   *
+   * @return std::string cache info string
+   */
   std::string toString();
 
-  static Cache *makeCache(unsigned int size, unsigned int associativity,
+  /**
+   * @brief Initialize a cache with the given parameters
+   *
+   * @param size cache size
+   * @param associativity cache associativity
+   * @param blockSize cache clock size
+   * @param cacheRP cache replacement policy
+   * @param missPenalty cache miss penalty
+   * @param tfr trace file to read mem accesses
+   * @return Cache* reference to created cache
+   */
+  static Cache* makeCache(unsigned int size, unsigned int associativity,
                           unsigned int blockSize, CacheRP cacheRP,
-                          unsigned int missPenalty);
+                          unsigned int missPenalty, TraceFile* tfr);
 
+  /**
+   * @brief Set the Address Masks for offset, index and tag for the built cache
+   *
+   */
+  void setAddressMasks();
+
+  /**
+   * @brief Obtains the offset, index and tag of the current address
+   *
+   * @param traceLine current trace line with address
+   */
+  void mapAddress(TraceLine* traceLine);
+
+  /**
+   * @brief Set the TraceFile object
+   *
+   */
+  void setTfr(TraceFile*);
+
+  /**
+   * @brief Get the cache size
+   *
+   * @return unsigned int cache size
+   */
   unsigned int getSize();
+
+  /**
+   * @brief Get the cache associativity
+   *
+   * @return unsigned int cache associativity
+   */
   unsigned int getAssociativity();
   unsigned int getBlockSize();
   CacheRP getCacheRP();
