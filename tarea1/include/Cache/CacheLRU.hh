@@ -21,7 +21,7 @@ class CacheLRU : public Cache {
 
   void writeLru();
 
-  std::vector<std::list<long int>*>* lruList;
+  std::vector<std::list<long int>> lruList;
 
  public:
   //! Constructor sets parameters of the cache and the trace File reference.
