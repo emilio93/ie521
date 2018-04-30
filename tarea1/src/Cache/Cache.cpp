@@ -5,6 +5,7 @@
 #include "Cache/CacheLRU.hh"
 #include "Cache/CacheNRU.hh"
 #include "Cache/CacheRandom.hh"
+#include "Cache/CacheSRRIP.hh"
 
 Cache* Cache::makeCache(unsigned int size, unsigned int associativity,
                         unsigned int blockSize, CacheRP cacheRP,
@@ -19,6 +20,10 @@ Cache* Cache::makeCache(unsigned int size, unsigned int associativity,
     return cache;
   } else if (cacheRP == RANDOM) {
     Cache* cache = new CacheRandom(size, associativity, blockSize, cacheRP,
+                                   missPenalty, tfr);
+    return cache;
+  } else if (cacheRP == SRRIP) {
+    Cache* cache = new CacheSRRIP(size, associativity, blockSize, cacheRP,
                                    missPenalty, tfr);
     return cache;
   }

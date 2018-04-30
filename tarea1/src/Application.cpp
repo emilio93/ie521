@@ -46,6 +46,11 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
+  if (cache == NULL) {
+    std::cout << "Error: Politica de remplazo no implementada" << std::endl;
+    return 0;
+  }
+
   const char separator = ' ';
   const int parWidth = 40;
   const int valWidth = 8;
