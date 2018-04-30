@@ -2,7 +2,7 @@
 
 rm results.csv 2> /dev/null
 touch results.csv
-echo "Identificador,Cache Size(KB),Cache Associativity,Cache Block Size(bytes),Cache replacement policy,Miss penalty(cyc),Id,Cache Size(KB),Cache Associativity,Cache Block Size(bytes),Cache replacement policy,Miss penalty(cyc),Execution time(cycles),instructions,Memory accesses,Overall miss rate,Read miss rate,Average memory access time (cycles),Dirty evictions,Load misses,Store misses,Total misses,Load hits,Store hits,Total hits,CPI\
+echo "Identificador,Cache Size(KB),Cache Associativity,Cache Block Size(bytes),Cache replacement policy,Miss penalty(cyc),Execution time(cycles),instructions,Memory accesses,Overall miss rate,Read miss rate,Average memory access time (cycles),Dirty evictions,Load misses,Store misses,Total misses,Load hits,Store hits,Total hits,CPI\
 " > results.csv
 
 for trace in ./data/*.gz; do

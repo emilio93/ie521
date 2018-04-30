@@ -245,7 +245,7 @@ void printCsv(Cache* cache, char separator, CLI* cli) {
         << " -rp " << cacheRPToString(cache->getCacheRP()) << " -f " << cli->getOpts().at(TRACE_FILENAME) << separator << cache->getSize()
         << separator << cache->getAssociativity() << separator
         << cache->getBlockSize() << separator << cache->getMissPenalty()
-        << separator << cache->getCacheRP() << separator
+        << separator << cacheRPToString(cache->getCacheRP()) << separator
         << cache->getSimResults() << separator << cache->getInstructions()
         << separator << cache->getMemAccesses() << separator
         << cache->getMissRate() << separator << cache->getRdMissRate()
