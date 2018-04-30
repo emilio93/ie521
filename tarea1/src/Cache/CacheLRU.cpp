@@ -26,50 +26,39 @@ CacheLRU::~CacheLRU() { ; }
 void CacheLRU::access(TraceLine* traceLine) {
   if (this->isHit) {  // hit
 
-    try {
-      // move to front of list
-      this->lruList.at(this->index)
-          .splice(this->lruList.at(this->index).begin(),
-                  this->lruList.at(this->index),
-                  this->lruMap.at(this->index).at(this->tag));
-    } catch (const std::out_of_range& e) {
-      std::cout << std::endl;
-      std::cout << this->tag << "   " << e.what() << std::endl;
-    }
+    // move to front of list
+    auto begin = std::begin(lruList.at(this->index));
+    auto it = this->lruMap.at(this->index).at(this->tag);
+    this->lruList.at(this->index)
+        .splice(begin, this->lruList.at(this->index), it);
+
     // update element mapping
     this->lruMap.at(this->index)
         .insert_or_assign(this->tag, this->lruList.at(this->index).begin());
-    // No update required in the cache
-    this->cache.at(this->index)
-        .insert_or_assign(this->tag, CacheInfo(false, true));
 
   } else {  // miss
-    try {
-      auto it = this->cache.at(this->index)
-                    .find(this->lruList.at(this->index).back());
-      if (this->cache.at(this->index)
-              .at(this->lruList.at(this->index).back())
-              .dirtyBit &&
-          this->cache.at(this->index)
-              .at(this->lruList.at(this->index).back())
-              .valid) {
-        this->setDirtyEvictions(this->getDirtyEvictions() + 1);
-      }
-
-      // remove lru item
-      this->lruMap.at(this->index).erase(this->lruList.at(this->index).back());
-      this->cache.at(this->index).erase(this->lruList.at(this->index).back());
-      this->lruList.at(this->index).pop_back();
-
-      // always push the new element on miss
-      this->lruList.at(this->index).push_front(this->tag);
-      // map the element
-      this->lruMap.at(this->index)
-          .insert_or_assign(this->tag, this->lruList.at(this->index).begin());
-      // insert element to cache, not dirty, valid
-      this->cache.at(this->index).insert_or_assign(this->tag, CacheInfo(0, 1));
-    } catch (std::out_of_range& e) {
-      std::cout << e.what() << std::endl;
+    auto it =
+        this->cache.at(this->index).find(this->lruList.at(this->index).back());
+    if (this->cache.at(this->index)
+            .find(this->lruList.at(this->index).back())
+            ->second.dirtyBit &&
+        this->cache.at(this->index)
+            .find(this->lruList.at(this->index).back())
+            ->second.valid) {
+      this->setDirtyEvictions(this->getDirtyEvictions() + 1);
     }
+
+    // remove lru item
+    this->cache.at(this->index).erase(this->lruList.at(this->index).back());
+    this->lruMap.at(this->index).erase(this->lruList.at(this->index).back());
+    this->lruList.at(this->index).pop_back();
+
+    // always push the new element on miss
+    this->lruList.at(this->index).push_front(this->tag);
+    // map the element
+    this->lruMap.at(this->index)
+        .insert_or_assign(this->tag, this->lruList.at(this->index).begin());
+    // insert element to cache, not dirty, valid
+    this->cache.at(this->index).insert_or_assign(this->tag, CacheInfo(0, 1));
   }
 };
