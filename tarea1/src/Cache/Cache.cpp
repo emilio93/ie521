@@ -24,7 +24,7 @@ Cache* Cache::makeCache(unsigned int size, unsigned int associativity,
     return cache;
   } else if (cacheRP == SRRIP) {
     Cache* cache = new CacheSRRIP(size, associativity, blockSize, cacheRP,
-                                   missPenalty, tfr);
+                                  missPenalty, tfr);
     return cache;
   }
   return NULL;
@@ -78,7 +78,7 @@ Cache::Cache(unsigned int size, unsigned int associativity,
   this->setAddressMasks();
 };
 
-Cache::~Cache() {
+Cache::~Cache(){
 
 };
 
@@ -86,10 +86,10 @@ void Cache::simulate() {
   unsigned int i = 0;
   TraceLine* traceLine = TraceLine::makeTraceLine(tfr->getLine());
 
-
-
   // progress init
-  std::cout << "\r" << "0 lineas procesadas";
+  std::cout << "\r"
+            << "0 lineas procesadas";
+  std::cout.flush();
   do {
     traceLine->update(tfr->getLine());
     i++;
@@ -114,29 +114,26 @@ void Cache::simulate() {
     if ((this->cache.at(this->index).find(this->tag) !=
          this->cache.at(this->index).end()) &&
         this->cache.at(this->index).at(this->tag).valid) {
-
       // set isHit flag to true
       this->isHit = true;
 
       // add hit counter depending on whether is load or store
       if (traceLine->getLS() == 0) {  // load
         // set dirty bit on store hit
-        this->cache.at(this->index).at(this->tag).dirtyBit = 1;
+        this->cache.at(this->index).find(this->tag)->second.dirtyBit = true;
         this->setLoadHits(this->getLoadHits() + 1);
       } else {  // store
         this->setStoreHits(this->getStoreHits() + 1);
-
       }
-    } else { // miss
+    } else {  // miss
       // this->isHit = false; // this has been already done
 
-      // add miss penalty
-      this->setSimResults(this->getSimResults() + this->getMissPenalty());
-
       // add miss counter depending on whether is load or store
-      if (traceLine->getLS() == 0) { // load
+      if (traceLine->getLS() == 0) {  // load
+        // add miss penalty
+        this->setSimResults(this->getSimResults() + this->getMissPenalty());
         this->setLoadMisses(this->getLoadMisses() + 1);
-      } else { // store
+      } else {  // store
         this->setStoreMisses(this->getStoreMisses() + 1);
       }
     }
@@ -145,7 +142,7 @@ void Cache::simulate() {
     this->access(traceLine);
 
     // progress indicator
-    if (i % 50000 == 0) {
+    if (i % 10000 == 0) {
       std::cout << "\r" << std::to_string(i) << " lineas procesadas";
       std::cout.flush();
     }
@@ -159,12 +156,11 @@ void Cache::simulate() {
   this->setTotalHits(this->getLoadHits() + this->getStoreHits());
   this->setTotalMisses(this->getLoadMisses() + this->getStoreMisses());
 
-  this->setAvgMemAccessTime((float)this->getSimResults() /
-                            (float)this->getInstructions());
   this->setMissRate((float)this->getTotalMisses() /
                     (float)this->getMemAccesses());
   this->setRdMissRate((float)(this->getLoadMisses()) /
                       (float)(this->getLoadMisses() + this->getLoadHits()));
+  this->setAvgMemAccessTime(1 + this->getMissRate() * this->getMissPenalty());
 
   delete traceLine;
   traceLine = NULL;
@@ -197,13 +193,15 @@ void Cache::initCache() {
     this->cache.push_back(std::unordered_map<long int, CacheInfo>());
     tagCounter = 0;
     for (size_t j = 0; j < this->cacheLines; j++) {
-      this->cache.at(i).insert({tagCounter++, CacheInfo(0, 0)}); // unique tag, not valid, not dirty
+      this->cache.at(i).insert(
+          {tagCounter++, CacheInfo(0, 0)});  // unique tag, not valid, not dirty
     }
   }
 }
 
 void Cache::mapAddress(TraceLine* traceLine) {
-  // this->offset = (this->offsetMask & traceLine->getDireccion()); // this is neer used
+  // this->offset = (this->offsetMask & traceLine->getDireccion()); // this is
+  // neer used
   this->index =
       (this->indexMask & traceLine->getDireccion()) >> this->offsetBits;
   this->tag = (this->tagMask & traceLine->getDireccion()) >>

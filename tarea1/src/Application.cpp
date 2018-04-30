@@ -129,18 +129,18 @@ void printCacheResults(Cache* cache, char separator, int parWidth,
 
   std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
             << "Overall miss rate:";
-  std::cout << std::left << std::setw(parWidth) << std::setfill(separator) << cache->getMissRate()
-            << std::endl;
+  std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
+            << cache->getMissRate() << std::endl;
 
   std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
             << "Read miss rate:";
-  std::cout << std::left << std::setw(parWidth) << std::setfill(separator) << cache->getRdMissRate()
-            << std::endl;
+  std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
+            << cache->getRdMissRate() << std::endl;
 
   std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
             << "Average memory access time (cycles):";
-  std::cout << std::left << std::setw(parWidth) << std::setfill(separator) << cache->getAvgMemAccessTime()
-            << std::endl;
+  std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
+            << cache->getAvgMemAccessTime() << std::endl;
 
   std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
             << "Dirty evictions:";
@@ -176,6 +176,11 @@ void printCacheResults(Cache* cache, char separator, int parWidth,
             << "Total hits:";
   std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
             << cache->getTotalHits() << std::endl;
+
+              std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
+            << "CPI:";
+  std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
+            << ((float)cache->getSimResults()/(float)cache->getInstructions()) << std::endl;
 
   std::cout << std::endl;
 }
