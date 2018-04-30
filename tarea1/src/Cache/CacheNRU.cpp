@@ -15,7 +15,7 @@ CacheNRU::CacheNRU(unsigned int size, unsigned int associativity,
     NruMap mapN = NruMap();
     this->nruMap.push_back(mapN);
     for (size_t j = 0; j < this->cacheLines; j++) {
-      this->nruList.at(i).push_back(NruNode(j, 0));
+      this->nruList.at(i).push_back(NruNode(j, 1));
       this->nruMap.at(i).insert_or_assign(j, this->nruList.at(i).end());
     }
   }
@@ -31,8 +31,22 @@ void CacheNRU::access(TraceLine* traceLine) {
         std::find_if(std::begin(this->nruList.at(this->index)),
                      std::end(this->nruList.at(this->index)), this->isNru);
     if (it != this->nruList.at(this->index).end()) {
+      // count dirty eviction
+      if (this->cache.at(this->index).at(it->tag).dirtyBit &&
+          this->cache.at(this->index).at(it->tag).valid) {
+        // add to dirty evictions
+        this->setDirtyEvictions(this->getDirtyEvictions() + 1);
+      }
+      // remove elements
+      this->cache.at(this->index).erase(it->tag);
+      this->nruMap.at(this->index).erase(it->tag);
+      // set new element
       it->nruBit = 0;
-    } else {
+      it->tag = this->tag;
+      this->nruMap.at(this->index).insert_or_assign(this->tag, it);
+      this->cache.at(this->index).insert_or_assign(this->tag, CacheInfo(0, 1));
+
+    } else {  // no nru bits set to 1
       // count dirty eviction
       if (this->cache.at(this->index)
               .at(this->nruList.at(this->index).front().tag)
@@ -47,7 +61,6 @@ void CacheNRU::access(TraceLine* traceLine) {
       for (auto var : this->nruList.at(this->index)) {
         var.nruBit = 1;
       }
-
       // remove elements
       this->cache.at(this->index)
           .erase(this->nruList.at(this->index).front().tag);
