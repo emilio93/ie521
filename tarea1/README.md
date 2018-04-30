@@ -1,47 +1,82 @@
 # Cache Memory Simulation
+
 This project simulates a cache memory with the given parameters in many replacement policies scenarios.
 
 ## Compiling
+
+Install basic developing tools which may not be already in your system
+
+```bash
+sudo apt-get update
+sudo apt-get install build-essential software-properties-common -y
+```
+
+Thits project has been ested with ```g++ 7.2.0```. Check `g++` version:
+
+```bash
+which g++
+```
+
+In any case, standard `c++17` is required.
+
 Uses zlib and libboost .
-```
+
+```bash
 # install zlib
-sudo apt-get install zlib1g 
+sudo apt-get install zlib1g
+sudo apt-get install zlib1g-dev
 # install libboost_iostreams
-sudo apt-get install libboost-iostreams-dev 
+sudo apt-get install libboost-iostreams-dev
 ```
 
-Compile via build script.
-```
-./build.sh
-``` 
-This generates an excecutable file `./bin/cache`.
+Compiles via make(installed by default in most systems):
 
-Or modify the current compiling command.
-```
-g++ -Isrc/Cli -Isrc src/**/*.cpp src/*.cpp -o ./bin/cache -lboost_iostreams -lz 
+```bash
+make
 ```
 
-This has to be run from the folder which contains the src folder.
+_This has to be run from the folder which contains the Makefile._
+
+This generates a symlink to an excecutable, `./cache`.
 
 ## Running
 
-All the flags must be declared
-```
+### Example of use
+
+```bash
 ./bin/cache -t 32 -a 4 -l 32 -mp 30 -rp LRU
 ```
- - `-t`: cache size in kilobytes(kB).
- - `-a`: cache associativity(1,2,4,...).
- - `-l`: cache block size in bytes.
- - `-mp`: miss penalty in cycles.
- - `-rp`: Replacement policy(LRU, NRU, SRRIP, random).
+
+These flags must be declared
+
+- `-t`: cache size in kilobytes(kB). Must be an integer.
+- `-a`: cache associativity(1,2,4,...). Must be an integer.
+- `-l`: cache block size in bytes. Must be an integer.
+- `-mp`: miss penalty in cycles. Must be an integer.
+- `-rp`: Replacement policy. Must be any of the implemented replacement policies(case sensitive):
+  - `LRU`
+  - `NRU`
+  - `SRRIP`
+  - `random`
+
+If any of the previous flags is not defined or value is invalid, the program will stop.
+
+Optional flags:
+
+```bash
+./bin/cache -t 32 -a 4 -l 32 -mp 30 -rp LRU -f data/mcf.trace.gz -c 1.05
+```
+
+- `-f`: filepath to gunziped trace. Defaults to `data/art.trace.gz`. Program will stop if problems with file are found(doesn't exist, incorrect format, etc).
+- `-c`: cycle multiplier. Defaults to 1. Float type.
 
 Any other tag will be ignored.
 
-Requires a trace file `./data/art.trace.gz`.
+## Running Automated Tests
 
-> 
-> **TODO** Optional flag `-f` allows any tracefile to be used as > inputs fot the simulation.
-> ```
-> ./bin/cache -t 32 -a 4 -l 32 -mp 30 -rp LRU -f ./data/art.trace.gz
-> ```
-> **TODO** Enable uncommpressed traces.
+Place all traces to be analyzed in the `./data` folder.
+Run the script:
+
+```bash
+./scripts/runTests.sh
+```

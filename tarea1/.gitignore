@@ -1,0 +1,7 @@
+build
+third-party
+otherData
+bin
+.vscode
+cache
+*.out
