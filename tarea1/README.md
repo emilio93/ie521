@@ -64,12 +64,11 @@ If any of the previous flags is not defined or value is invalid, the program wil
 Optional flags:
 
 ```bash
-./bin/cache -t 32 -a 4 -l 32 -mp 30 -rp LRU -f data/mcf.trace.gz -c 1.05 -print-csv 1
+./bin/cache -t 32 -a 4 -l 32 -mp 30 -rp LRU -f data/mcf.trace.gz -c 1.05
 ```
 
 - `-f`: filepath to gunziped trace. Defaults to `data/art.trace.gz`. Program will stop if problems with file are found(doesn't exist, incorrect format, etc).
 - `-c`: cycle multiplier. Defaults to 1. Float type.
-- `-print-csv`: prints csv if set to 1. Defaults to 0, meaning tabulated printing.
 
 Any other tag will be ignored.
 

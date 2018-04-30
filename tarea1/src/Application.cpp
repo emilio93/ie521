@@ -1,8 +1,12 @@
 #include <sys/resource.h>
+#include <sys/stat.h>
 #include <sys/time.h>
+#include <unistd.h>
 #include <exception>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <string>
 
 #include "Cache/Cache.hh"
 #include "Cli/Cli.hh"
@@ -13,6 +17,7 @@
 void printCacheInfo(Cache* cache, char separator, int parWidth, int valWidth);
 void printCacheResults(Cache* cache, char separator, int parWidth,
                        int valWidth);
+void printCsv(Cache* cache, char separator, CLI* cli);
 
 int main(int argc, char* argv[]) {
   const clock_t begin_time = clock();
@@ -35,12 +40,13 @@ int main(int argc, char* argv[]) {
 
   Cache* cache;
   try {
-    cache =
-        Cache::makeCache(std::stoi(cli->getOpts().at(TAMANO_CACHE)),
-                         std::stoi(cli->getOpts().at(ASOCIATIVIDAD)),
-                         std::stoi(cli->getOpts().at(TAMANO_LINEA)),
-                         stringToCacheRP(cli->getOpts().at(POLITICA_REMPLAZO)),
-                         std::stoi(cli->getOpts().at(MISS_PENALTY)), std::strtof((cli->getOpts().at(CYCLE_MUL)).c_str(),0), tfr);
+    cache = Cache::makeCache(
+        std::stoi(cli->getOpts().at(TAMANO_CACHE)),
+        std::stoi(cli->getOpts().at(ASOCIATIVIDAD)),
+        std::stoi(cli->getOpts().at(TAMANO_LINEA)),
+        stringToCacheRP(cli->getOpts().at(POLITICA_REMPLAZO)),
+        std::stoi(cli->getOpts().at(MISS_PENALTY)),
+        std::strtof((cli->getOpts().at(CYCLE_MUL)).c_str(), 0), tfr);
   } catch (const std::exception& e) {
     std::cout << e.what() << std::endl;
     return 0;
@@ -61,13 +67,15 @@ int main(int argc, char* argv[]) {
 
   cache->simulate();
 
+  printCacheResults(cache, separator, parWidth, valWidth);
+  printCsv(cache, ',', cli);
+
   delete tfr;
   tfr = NULL;
 
   delete cli;
   cli = NULL;
 
-  printCacheResults(cache, separator, parWidth, valWidth);
 
   delete cache;
   cache = NULL;
@@ -177,10 +185,78 @@ void printCacheResults(Cache* cache, char separator, int parWidth,
   std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
             << cache->getTotalHits() << std::endl;
 
-              std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
+  std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
             << "CPI:";
   std::cout << std::left << std::setw(parWidth) << std::setfill(separator)
-            << ((float)cache->getSimResults()/(float)cache->getInstructions()) << std::endl;
+            << ((float)cache->getSimResults() / (float)cache->getInstructions())
+            << std::endl;
 
   std::cout << std::endl;
+}
+
+void printCsv(Cache* cache, char separator, CLI* cli) {
+  char filename[] = "results.csv";
+  std::fstream appendFileToWorkWith;
+
+  appendFileToWorkWith.open(
+      filename, std::fstream::in | std::fstream::out | std::fstream::app);
+
+  // If file does not exist, Create new file
+  if (!appendFileToWorkWith) {
+    appendFileToWorkWith.open(
+        filename, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    appendFileToWorkWith
+        << "Identificador" << separator << "Cache Size(KB)" << separator << "Cache Associativity" << separator
+        << "Cache Block Size(bytes)" << separator << "Cache replacement policy"
+        << separator << "Miss penalty(cyc)" << separator << "Id" << separator
+        << "Cache Size(KB)" << separator << "Cache Associativity" << separator
+        << "Cache Block Size(bytes)" << separator << "Cache replacement policy"
+        << separator << "Miss penalty(cyc)" << separator
+        << "Execution time(cycles)" << separator << "instructions" << separator
+        << "Memory accesses" << separator << "Overall miss rate" << separator
+        << "Read miss rate" << separator
+        << "Average memory access time (cycles)" << separator
+        << "Dirty evictions" << separator << "Load misses" << separator
+        << "Store misses" << separator << "Total misses" << separator
+        << "Load hits" << separator << "Store hits" << separator << "Total hits"
+        << separator << "CPI"
+        << "\n\n"
+        << "-t " << cache->getSize() << " -a " << cache->getAssociativity()
+        << " -l " << cache->getBlockSize() << " -mp " << cache->getMissPenalty()
+        << " -rp " << cacheRPToString(cache->getCacheRP()) << separator << cache->getSize()
+        << separator << cache->getAssociativity() << separator
+        << cache->getBlockSize() << separator << cache->getMissPenalty()
+        << separator << cache->getCacheRP() << separator
+        << cache->getSimResults() << separator << cache->getInstructions()
+        << separator << cache->getMemAccesses() << separator
+        << cache->getMissRate() << separator << cache->getRdMissRate()
+        << separator << cache->getAvgMemAccessTime() << separator
+        << cache->getDirtyEvictions() << separator << cache->getLoadMisses()
+        << separator << cache->getStoreMisses() << separator
+        << cache->getTotalMisses() << separator << cache->getLoadHits()
+        << separator << cache->getStoreHits() << separator
+        << cache->getTotalHits() << separator
+        << ((float)cache->getSimResults() / (float)cache->getInstructions())
+        << "\n";
+  } else {
+    appendFileToWorkWith
+        << "-t " << cache->getSize() << " -a " << cache->getAssociativity()
+        << " -l " << cache->getBlockSize() << " -mp " << cache->getMissPenalty()
+        << " -rp " << cacheRPToString(cache->getCacheRP()) << " -f " << cli->getOpts().at(TRACE_FILENAME) << separator << cache->getSize()
+        << separator << cache->getAssociativity() << separator
+        << cache->getBlockSize() << separator << cache->getMissPenalty()
+        << separator << cache->getCacheRP() << separator
+        << cache->getSimResults() << separator << cache->getInstructions()
+        << separator << cache->getMemAccesses() << separator
+        << cache->getMissRate() << separator << cache->getRdMissRate()
+        << separator << cache->getAvgMemAccessTime() << separator
+        << cache->getDirtyEvictions() << separator << cache->getLoadMisses()
+        << separator << cache->getStoreMisses() << separator
+        << cache->getTotalMisses() << separator << cache->getLoadHits()
+        << separator << cache->getStoreHits() << separator
+        << cache->getTotalHits() << separator
+        << ((float)cache->getSimResults() / (float)cache->getInstructions())
+        << "\n";
+    appendFileToWorkWith.close();
+  }
 }

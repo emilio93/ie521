@@ -18,7 +18,6 @@ enum CliOption {
   MISS_PENALTY,
   TRACE_FILENAME,
   CYCLE_MUL,
-  CSV_PRINT,
   NO_OPTION
 };
 

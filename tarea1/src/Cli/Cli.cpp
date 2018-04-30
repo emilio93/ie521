@@ -34,12 +34,6 @@ void CLI::getPairs() {
     this->opts.insert({TRACE_FILENAME, "data/art.trace.gz"});
   }
   try {
-    this->getOpts().at(CSV_PRINT);
-  } catch (std::out_of_range& e) {
-    // default CSV_PRINT
-    this->opts.insert({CSV_PRINT, "0"});
-  }
-  try {
     this->getOpts().at(CYCLE_MUL);
   } catch (std::out_of_range& e) {
     // default CYCLE_MUL

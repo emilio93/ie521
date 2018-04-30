@@ -1,5 +1,10 @@
 #!/bin/bash
 
+rm results.csv 2> /dev/null
+touch results.csv
+echo "Identificador,Cache Size(KB),Cache Associativity,Cache Block Size(bytes),Cache replacement policy,Miss penalty(cyc),Id,Cache Size(KB),Cache Associativity,Cache Block Size(bytes),Cache replacement policy,Miss penalty(cyc),Execution time(cycles),instructions,Memory accesses,Overall miss rate,Read miss rate,Average memory access time (cycles),Dirty evictions,Load misses,Store misses,Total misses,Load hits,Store hits,Total hits,CPI\
+" > results.csv
+
 for trace in ./data/*.gz; do
     echo " "
     echo "-------------- ${trace} --------------"
@@ -16,7 +21,6 @@ for trace in ./data/*.gz; do
     cacheBlockSize=16
     missPenalty=5
     cacheRP="LRU"
-    printCsv=1
     cacheAssoc=1
 
     TEMPFILE=/tmp/$$.tmp
@@ -24,8 +28,8 @@ for trace in ./data/*.gz; do
     COUNTER=$[$(cat $TEMPFILE)]
     for i in "${tamanoCache[@]}"
     do
-        echo ./cache -t ${i} -a ${cacheAssoc} -l ${cacheBlockSize} -mp ${missPenalty} -rp ${cacheRP} -f ${trace} -c ${cycleMult[$COUNTER]} -print-csv ${printCsv}
-        ./cache -t ${i} -a ${cacheAssoc} -l ${cacheBlockSize} -mp ${missPenalty} -rp ${cacheRP} -f ${trace} -c ${cycleMult[$COUNTER]} -print-csv ${printCsv}
+        echo ./cache -t ${i} -a ${cacheAssoc} -l ${cacheBlockSize} -mp ${missPenalty} -rp ${cacheRP} -f ${trace} -c ${cycleMult[$COUNTER]}
+        ./cache -t ${i} -a ${cacheAssoc} -l ${cacheBlockSize} -mp ${missPenalty} -rp ${cacheRP} -f ${trace} -c ${cycleMult[$COUNTER]}
         echo "----------------------------"
         COUNTER=$[$(cat $TEMPFILE) + 1]
         echo $COUNTER > $TEMPFILE
@@ -43,7 +47,6 @@ for trace in ./data/*.gz; do
 
     cacheSize=16
     cacheRP="LRU"
-    printCsv=1
     cacheAssoc=1
 
     TEMPFILE=/tmp/$$.tmp
@@ -51,8 +54,8 @@ for trace in ./data/*.gz; do
     COUNTER=$[$(cat $TEMPFILE)]
     for i in "${tamanoBloque[@]}"
     do
-        echo ./cache -t ${cacheSize} -a ${cacheAssoc} -l ${i} -mp ${missPenalty[$COUNTER]} -rp ${cacheRP} -f ${trace} -print-csv ${printCsv}
-        ./cache -t ${cacheSize} -a ${cacheAssoc} -l ${i} -mp ${missPenalty[$COUNTER]} -rp ${cacheRP} -f ${trace} -print-csv ${printCsv}
+        echo ./cache -t ${cacheSize} -a ${cacheAssoc} -l ${i} -mp ${missPenalty[$COUNTER]} -rp ${cacheRP} -f ${trace}
+        ./cache -t ${cacheSize} -a ${cacheAssoc} -l ${i} -mp ${missPenalty[$COUNTER]} -rp ${cacheRP} -f ${trace}
         echo "----------------------------"
         COUNTER=$[$(cat $TEMPFILE) + 1]
         echo $COUNTER > $TEMPFILE
@@ -73,7 +76,6 @@ for trace in ./data/*.gz; do
 
     tamanoBloque=16
     cacheSize=16
-    printCsv=1
     missPenalty=5
 
     for i in "${cacheRP[@]}"
@@ -83,8 +85,8 @@ for trace in ./data/*.gz; do
         COUNTER=$[$(cat $TEMPFILE)]
         for j in "${cacheAssoc[@]}"
         do
-            echo ./cache -t ${cacheSize} -a ${j} -l ${tamanoBloque} -mp ${missPenalty} -rp ${i} -f ${trace} -c ${cycleMult[$COUNTER]} -print-csv ${printCsv}
-            ./cache -t ${cacheSize} -a ${j} -l ${tamanoBloque} -mp ${missPenalty} -rp ${i} -f ${trace} -c ${cycleMult[$COUNTER]} -print-csv ${printCsv}
+            echo ./cache -t ${cacheSize} -a ${j} -l ${tamanoBloque} -mp ${missPenalty} -rp ${i} -f ${trace} -c ${cycleMult[$COUNTER]}
+            ./cache -t ${cacheSize} -a ${j} -l ${tamanoBloque} -mp ${missPenalty} -rp ${i} -f ${trace} -c ${cycleMult[$COUNTER]}
             echo "----------------------------"
             COUNTER=$[$(cat $TEMPFILE) + 1]
             echo $COUNTER > $TEMPFILE
