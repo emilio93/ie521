@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
                          std::stoi(cli->getOpts().at(ASOCIATIVIDAD)),
                          std::stoi(cli->getOpts().at(TAMANO_LINEA)),
                          stringToCacheRP(cli->getOpts().at(POLITICA_REMPLAZO)),
-                         std::stoi(cli->getOpts().at(MISS_PENALTY)), tfr);
+                         std::stoi(cli->getOpts().at(MISS_PENALTY)), std::strtof((cli->getOpts().at(CYCLE_MUL)).c_str(),0), tfr);
   } catch (const std::exception& e) {
     std::cout << e.what() << std::endl;
     return 0;

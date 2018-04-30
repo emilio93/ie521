@@ -9,22 +9,23 @@
 
 Cache* Cache::makeCache(unsigned int size, unsigned int associativity,
                         unsigned int blockSize, CacheRP cacheRP,
-                        unsigned int missPenalty, TraceFile* tfr) {
+                        unsigned int missPenalty, float cycMult,
+                        TraceFile* tfr) {
   if (cacheRP == LRU) {
-    Cache* cache =
-        new CacheLRU(size, associativity, blockSize, cacheRP, missPenalty, tfr);
+    Cache* cache = new CacheLRU(size, associativity, blockSize, cacheRP,
+                                missPenalty, cycMult, tfr);
     return cache;
   } else if (cacheRP == NRU) {
-    Cache* cache =
-        new CacheNRU(size, associativity, blockSize, cacheRP, missPenalty, tfr);
+    Cache* cache = new CacheNRU(size, associativity, blockSize, cacheRP,
+                                missPenalty, cycMult, tfr);
     return cache;
   } else if (cacheRP == RANDOM) {
     Cache* cache = new CacheRandom(size, associativity, blockSize, cacheRP,
-                                   missPenalty, tfr);
+                                   missPenalty, cycMult, tfr);
     return cache;
   } else if (cacheRP == SRRIP) {
     Cache* cache = new CacheSRRIP(size, associativity, blockSize, cacheRP,
-                                  missPenalty, tfr);
+                                  missPenalty, cycMult, tfr);
     return cache;
   }
   return NULL;
@@ -32,13 +33,14 @@ Cache* Cache::makeCache(unsigned int size, unsigned int associativity,
 
 Cache::Cache(unsigned int size, unsigned int associativity,
              unsigned int blockSize, CacheRP cacheRP, unsigned int missPenalty,
-             TraceFile* tfr) {
+             float cycMult, TraceFile* tfr) {
   this->setSize(size);
   this->setAssociativity(associativity);
   this->setBlockSize(blockSize);
   this->setCacheRP(cacheRP);
   this->setMissPenalty(missPenalty);
   this->setTfr(tfr);
+  this->cycMult = cycMult;
 
   if (!tfr->nextLine()) {
     throw std::invalid_argument("Error en el archivo utilizado");
@@ -151,6 +153,9 @@ void Cache::simulate() {
 
   std::cout << "\r" << std::to_string(i) << " lineas procesadas";
   std::cout << std::endl;
+
+  // update sim results
+  this->setSimResults(std::floor((float)this->getSimResults()*this->cycMult));
 
   // Set total misses/hits based on ld/st hits/misses
   this->setTotalHits(this->getLoadHits() + this->getStoreHits());

@@ -30,7 +30,7 @@ class CacheLRU : public Cache {
   //! Constructor sets parameters of the cache and the trace File reference.
   explicit CacheLRU(unsigned int size, unsigned int associativity,
                     unsigned int blockSize, CacheRP cacheRP,
-                    unsigned int missPenalty, TraceFile* tfr);
+                    unsigned int missPenalty, float cycMult, TraceFile* tfr);
   ~CacheLRU();
   //! Single memory access implemented to satisfy lru rp.
   void access(TraceLine* traceLine);

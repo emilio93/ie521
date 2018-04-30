@@ -231,6 +231,7 @@ class Cache {
    *
    */
   bool isHit;
+  float cycMult;
 
   /**
    * @breif cache mem stores tags. Sets of lines
@@ -250,7 +251,7 @@ class Cache {
    * @param tfr trace file to simulate
    */
   Cache(unsigned int size, unsigned int associativity, unsigned int blockSize,
-        CacheRP cacheRP, unsigned int missPenalty, TraceFile* tfr);
+        CacheRP cacheRP, unsigned int missPenalty, float cycMult, TraceFile* tfr);
 
  public:
   /**
@@ -299,7 +300,7 @@ class Cache {
    */
   static Cache* makeCache(unsigned int size, unsigned int associativity,
                           unsigned int blockSize, CacheRP cacheRP,
-                          unsigned int missPenalty, TraceFile* tfr);
+                          unsigned int missPenalty, float cycMult, TraceFile* tfr);
 
   /**
    * @brief Set the Address Masks for offset, index and tag for the built cache

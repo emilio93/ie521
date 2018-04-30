@@ -2,8 +2,8 @@
 
 CacheRandom::CacheRandom(unsigned int size, unsigned int associativity,
                    unsigned int blockSize, CacheRP cacheRP,
-                   unsigned int missPenalty, TraceFile* tfr)
-    : Cache(size, associativity, blockSize, cacheRP, missPenalty, tfr) {
+                   unsigned int missPenalty, float cycMult, TraceFile* tfr)
+    : Cache(size, associativity, blockSize, cacheRP, missPenalty, cycMult, tfr) {
   this->randEl = std::default_random_engine(this->r());
   this->uniformDist = std::uniform_int_distribution<int>(0, this->cacheLines-1);
 };

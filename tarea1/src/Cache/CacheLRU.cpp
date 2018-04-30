@@ -2,8 +2,8 @@
 
 CacheLRU::CacheLRU(unsigned int size, unsigned int associativity,
                    unsigned int blockSize, CacheRP cacheRP,
-                   unsigned int missPenalty, TraceFile* tfr)
-    : Cache(size, associativity, blockSize, cacheRP, missPenalty, tfr) {
+                   unsigned int missPenalty, float cycMult, TraceFile* tfr)
+    : Cache(size, associativity, blockSize, cacheRP, missPenalty, cycMult, tfr) {
   this->lruList = std::vector<LruList>();
   this->lruMap = std::vector<LruMap>();
 

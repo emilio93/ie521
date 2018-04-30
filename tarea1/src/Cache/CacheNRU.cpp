@@ -2,8 +2,8 @@
 
 CacheNRU::CacheNRU(unsigned int size, unsigned int associativity,
                    unsigned int blockSize, CacheRP cacheRP,
-                   unsigned int missPenalty, TraceFile* tfr)
-    : Cache(size, associativity, blockSize, cacheRP, missPenalty, tfr) {
+                   unsigned int missPenalty, float cycMult, TraceFile* tfr)
+    : Cache(size, associativity, blockSize, cacheRP, missPenalty, cycMult, tfr) {
   this->nruList = std::vector<NruList>();
   this->nruMap = std::vector<NruMap>();
 

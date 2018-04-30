@@ -50,7 +50,7 @@ class CacheSRRIP : public Cache {
   //! Runs the tests on the cache with the given parameters and assign results.
   explicit CacheSRRIP(unsigned int size, unsigned int associativity,
                     unsigned int blockSize, CacheRP cacheRP,
-                    unsigned int missPenalty, TraceFile* tfr);
+                    unsigned int missPenalty, float cycMult, TraceFile* tfr);
 
   //! Single memory access implemented to satisfy srrip rp.
   void access(TraceLine* traceLine);
