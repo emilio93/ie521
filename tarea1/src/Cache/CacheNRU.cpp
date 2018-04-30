@@ -58,8 +58,9 @@ void CacheNRU::access(TraceLine* traceLine) {
         this->setDirtyEvictions(this->getDirtyEvictions() + 1);
       }
       // set all nru bits to 1 and push to front
-      for (auto var : this->nruList.at(this->index)) {
-        var.nruBit = 1;
+      for (auto iter = this->nruList.at(this->index).begin();
+           iter != this->nruList.at(this->index).end(); iter++) {
+             iter->nruBit = iter->nruBit+1;
       }
       // remove elements
       this->cache.at(this->index)
