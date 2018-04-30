@@ -14,6 +14,10 @@ CacheLRU::CacheLRU(unsigned int size, unsigned int associativity,
 
     LruMap mapN = LruMap();
     this->lruMap.push_back(mapN);
+    for (size_t j = 0; j < this->cacheLines; j++) {
+      this->lruList.at(i).push_front(j);
+      this->lruMap.at(i).insert_or_assign(j, this->lruList.at(i).begin());
+    }
   }
 };
 
@@ -23,6 +27,7 @@ void CacheLRU::access(TraceLine* traceLine) {
   if (this->isHit) {  // hit
 
     try {
+      // move to front of list
       this->lruList.at(this->index)
           .splice(this->lruList.at(this->index).begin(),
                   this->lruList.at(this->index),
@@ -40,19 +45,21 @@ void CacheLRU::access(TraceLine* traceLine) {
 
   } else {  // miss
     try {
-      // cache set is full
-      if (this->lruList.at(this->index).size() == this->cacheLines) {
-
-        if (this->cache.at(this->index).at(this->lruList.at(this->index).back()).dirtyBit) {
-          this->setDirtyEvictions(this->getDirtyEvictions() + 1);
-        }
-        // remove lru item
-        this->lruMap.at(this->index)
-            .erase(this->lruList.at(this->index).back());
-        this->cache.at(this->index)
-            .erase(this->lruList.at(this->index).back());
-        this->lruList.at(this->index).pop_back();
+      auto it = this->cache.at(this->index)
+                    .find(this->lruList.at(this->index).back());
+      if (this->cache.at(this->index)
+              .at(this->lruList.at(this->index).back())
+              .dirtyBit &&
+          this->cache.at(this->index)
+              .at(this->lruList.at(this->index).back())
+              .valid) {
+        this->setDirtyEvictions(this->getDirtyEvictions() + 1);
       }
+
+      // remove lru item
+      this->lruMap.at(this->index).erase(this->lruList.at(this->index).back());
+      this->cache.at(this->index).erase(this->lruList.at(this->index).back());
+      this->lruList.at(this->index).pop_back();
 
       // always push the new element on miss
       this->lruList.at(this->index).push_front(this->tag);
@@ -60,8 +67,7 @@ void CacheLRU::access(TraceLine* traceLine) {
       this->lruMap.at(this->index)
           .insert_or_assign(this->tag, this->lruList.at(this->index).begin());
       // insert element to cache, not dirty, valid
-      this->cache.at(this->index)
-          .insert_or_assign(this->tag, CacheInfo(false, true));
+      this->cache.at(this->index).insert_or_assign(this->tag, CacheInfo(0, 1));
     } catch (std::out_of_range& e) {
       std::cout << e.what() << std::endl;
     }

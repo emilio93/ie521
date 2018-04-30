@@ -82,6 +82,7 @@ void Cache::simulate() {
   TraceLine* traceLine = TraceLine::makeTraceLine(tfr->getLine());
 
 
+
   // progress init
   std::cout << "\r" << "0 lineas procesadas";
   do {
@@ -114,9 +115,9 @@ void Cache::simulate() {
 
       // add hit counter depending on whether is load or store
       if (traceLine->getLS() == 0) {  // load
-        this->setLoadHits(this->getLoadHits() + 1);
         // set dirty bit on store hit
-        this->cache.at(this->index).at(this->tag).dirtyBit = true;
+        this->cache.at(this->index).at(this->tag).dirtyBit = 1;
+        this->setLoadHits(this->getLoadHits() + 1);
       } else {  // store
         this->setStoreHits(this->getStoreHits() + 1);
 
@@ -143,12 +144,11 @@ void Cache::simulate() {
       std::cout << "\r" << std::to_string(i) << " lineas procesadas";
       std::cout.flush();
     }
-    //if (i == 90000) break;
+    // if (i == 90000) break;
   } while (tfr->nextLine());
 
   std::cout << "\r" << std::to_string(i) << " lineas procesadas";
   std::cout << std::endl;
-
 
   // Set total misses/hits based on ld/st hits/misses
   this->setTotalHits(this->getLoadHits() + this->getStoreHits());
@@ -192,7 +192,7 @@ void Cache::initCache() {
     this->cache.push_back(std::unordered_map<long int, CacheInfo>());
     tagCounter = 0;
     for (size_t j = 0; j < this->cacheLines; j++) {
-      this->cache.at(i).insert({tagCounter++, CacheInfo(false, false)}); // unique tag, not valid, not dirty
+      this->cache.at(i).insert({tagCounter++, CacheInfo(0, 0)}); // unique tag, not valid, not dirty
     }
   }
 }

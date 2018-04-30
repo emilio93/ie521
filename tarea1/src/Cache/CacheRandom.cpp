@@ -12,7 +12,7 @@ void CacheRandom::access(TraceLine* traceLine){
   if (!this->isHit) {
 
     auto random_it = std::next(this->cache.at(this->index).begin(), this->uniformDist(this->randEl));
-    if (random_it->second.dirtyBit && traceLine->getLS() == 0) {
+    if (random_it->second.valid && random_it->second.dirtyBit && traceLine->getLS() == 0) {
       this->setDirtyEvictions(this->getDirtyEvictions() + 1);
       // here the cache should write to main memory
     }
