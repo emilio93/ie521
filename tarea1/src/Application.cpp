@@ -67,15 +67,13 @@ int main(int argc, char* argv[]) {
   delete cli;
   cli = NULL;
 
-  // std::cout << "Cuenta Lineas: " << std::dec << i << std::endl;
-  // std::cout << "Ejecución en " << float(clock() - begin_time) /
-  // CLOCKS_PER_SEC
-  //           << "s" << std::endl;
-
   printCacheResults(cache, separator, parWidth, valWidth);
 
   delete cache;
   cache = NULL;
+
+  std::cout << "Ejecución en " << float(clock() - begin_time) / CLOCKS_PER_SEC
+            << "s" << std::endl;
 }
 
 void printCacheInfo(Cache* cache, char separator, int parWidth, int valWidth) {
