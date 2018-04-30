@@ -4,67 +4,66 @@ CacheLRU::CacheLRU(unsigned int size, unsigned int associativity,
                    unsigned int blockSize, CacheRP cacheRP,
                    unsigned int missPenalty, TraceFile* tfr)
     : Cache(size, associativity, blockSize, cacheRP, missPenalty, tfr) {
+  this->lruList = std::vector<LruList>();
+  this->lruMap = std::vector<LruMap>();
 
-  this->lruList = std::vector<std::list<long int>>();
-
+  // create lru lists and maps for each set
   for (size_t i = 0; i < this->getAssociativity(); i++) {
-    std::list<long int> *setN = new std::list<long int>();
-    this->lruList.push_back(*setN);
+    LruList setN = LruList();
+    this->lruList.push_back(setN);
+
+    LruMap mapN = LruMap();
+    this->lruMap.push_back(mapN);
   }
 };
+
+CacheLRU::~CacheLRU() { ; }
 
 void CacheLRU::access(TraceLine* traceLine) {
-  if (traceLine->getLS() == 0) { // load
-    CacheInfo* ci = this->readLru();
-  } else { // store
+  if (this->isHit) {  // hit
 
-  }
-
-};
-
-CacheInfo* CacheLRU::readLru() {
-  std::unordered_map<long int, CacheInfo*>* currSet =
-      this->cache->at(this->index);
-  std::list<long int> currLru = this->lruList.at(this->index);
-
-  if (this->isHit) { // hit
-    std::list<long>::const_iterator begin = currLru.begin();
-    std::list<long>::const_iterator oldTag = currLru.end();
-    oldTag--;
-    currLru.splice(begin, currLru, oldTag);
-  } else { // miss
-    if (currSet->size() == this->cacheLines) {
-      std::unordered_map<long int, CacheInfo*>::const_iterator oldIt =
-          currSet->find(currLru.back());
-      currSet->erase(oldIt);
-      currLru.pop_back();
+    try {
+      this->lruList.at(this->index)
+          .splice(this->lruList.at(this->index).begin(),
+                  this->lruList.at(this->index),
+                  this->lruMap.at(this->index).at(this->tag));
+    } catch (const std::out_of_range& e) {
+      std::cout << std::endl;
+      std::cout << this->tag << "   " << e.what() << std::endl;
     }
-    // std::cout<<currLru<<std::endl;
-    // currLru->push_front(this->tag);
-    // currSet->insert_or_assign(this->tag, new CacheInfo(0, 1));
+    // update element mapping
+    this->lruMap.at(this->index)
+        .insert_or_assign(this->tag, this->lruList.at(this->index).begin());
+    // No update required in the cache
+    this->cache.at(this->index)
+        .insert_or_assign(this->tag, CacheInfo(false, true));
 
-    return NULL;
-  }
-};
+  } else {  // miss
+    try {
+      // cache set is full
+      if (this->lruList.at(this->index).size() == this->cacheLines) {
 
-void CacheLRU::writeLru() {
-  std::unordered_map<long int, CacheInfo*>* currSet =
-      this->cache->at(this->index);
+        if (this->cache.at(this->index).at(this->lruList.at(this->index).back()).dirtyBit) {
+          this->setDirtyEvictions(this->getDirtyEvictions() + 1);
+        }
+        // remove lru item
+        this->lruMap.at(this->index)
+            .erase(this->lruList.at(this->index).back());
+        this->cache.at(this->index)
+            .erase(this->lruList.at(this->index).back());
+        this->lruList.at(this->index).pop_back();
+      }
 
-  // Miss
-  if (!this->isHit) {
-    // full cache
-    if (currSet->size() == this->cacheLines) {
-      std::unordered_map<long int, CacheInfo*>::const_iterator oldIt =
-          currSet->find(this->tag);
-      currSet->erase(oldIt);
-      this->lruList.at(this->index).pop_back();
+      // always push the new element on miss
+      this->lruList.at(this->index).push_front(this->tag);
+      // map the element
+      this->lruMap.at(this->index)
+          .insert_or_assign(this->tag, this->lruList.at(this->index).begin());
+      // insert element to cache, not dirty, valid
+      this->cache.at(this->index)
+          .insert_or_assign(this->tag, CacheInfo(false, true));
+    } catch (std::out_of_range& e) {
+      std::cout << e.what() << std::endl;
     }
-
-    this->lruList.at(this->index).push_front(this->tag);
-    CacheInfo* ci = new CacheInfo(0, 1);
-    currSet->insert_or_assign(this->tag, ci);
-  } else {  // Hit
-    currSet->insert_or_assign(this->tag, new CacheInfo(0, 1));
   }
 };

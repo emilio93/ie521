@@ -10,13 +10,13 @@ CacheRandom::CacheRandom(unsigned int size, unsigned int associativity,
 
 void CacheRandom::access(TraceLine* traceLine){
   if (!this->isHit) {
-    auto it = this->cache->at(this->index)->begin();
-    std::advance(it, this->uniformDist(this->randEl));
-    if (it->second->dirtyBit) {
+
+    auto random_it = std::next(this->cache.at(this->index).begin(), this->uniformDist(this->randEl));
+    if (random_it->second.dirtyBit && traceLine->getLS() == 0) {
       this->setDirtyEvictions(this->getDirtyEvictions() + 1);
       // here the cache should write to main memory
     }
-    this->cache->at(this->index)->erase(it);
-    this->cache->at(this->index)->insert_or_assign(this->tag, new CacheInfo(0, 1));
+    this->cache.at(this->index).erase(random_it);
+    this->cache.at(this->index).insert_or_assign(this->tag, CacheInfo(0, 1));
   }
 };

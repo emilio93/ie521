@@ -35,17 +35,31 @@ Cache::Cache(unsigned int size, unsigned int associativity,
   this->setMissPenalty(missPenalty);
   this->setTfr(tfr);
 
-  if (!tfr->nextLine())
+  if (!tfr->nextLine()) {
     throw std::invalid_argument("Error en el archivo utilizado");
+  }
+
+  // init all cache info to 0
+  this->setSimResults(0);
 
   this->setInstructions(0);
+
   this->setMemAccesses(0);
+
+  this->setMissRate(0);
+  this->setRdMissRate(0);
+
+  this->setAvgMemAccessTime(0);
+
   this->setDirtyEvictions(0);
-  this->setLoadHits(0);
+
   this->setLoadMisses(0);
-  this->setStoreHits(0);
   this->setStoreMisses(0);
-  this->setSimResults(0);
+  this->setTotalMisses(0);
+
+  this->setLoadHits(0);
+  this->setStoreHits(0);
+  this->setTotalHits(0);
 
   this->initCache();
 
@@ -59,20 +73,20 @@ Cache::Cache(unsigned int size, unsigned int associativity,
   this->setAddressMasks();
 };
 
+Cache::~Cache() {
+
+};
+
 void Cache::simulate() {
   unsigned int i = 0;
   TraceLine* traceLine = TraceLine::makeTraceLine(tfr->getLine());
 
-  std::cout << "\r"
-            << "0 lineas procesadas";
+
+  // progress init
+  std::cout << "\r" << "0 lineas procesadas";
   do {
     traceLine->update(tfr->getLine());
     i++;
-    // cycles
-    this->setInstructions(this->getInstructions() + traceLine->getIC());
-
-    // mem accesses
-    this->setMemAccesses(this->getMemAccesses() + 1);
 
     // set address parts. offset, index and tag
     this->mapAddress(traceLine);
@@ -81,43 +95,62 @@ void Cache::simulate() {
     // possible miss penalty is added later on
     this->setSimResults(this->getSimResults() + traceLine->getIC());
 
-    std::unordered_map<long int, CacheInfo*>* currSet =
-        this->cache->at(this->index);
+    // cycles
+    this->setInstructions(this->getInstructions() + traceLine->getIC());
+
+    // mem accesses(every traceLine is a new mem access)
+    this->setMemAccesses(this->getMemAccesses() + 1);
 
     // asume we have a miss
     this->isHit = false;
 
-    // hit
-    if ((currSet->find(this->tag) != currSet->end()) &&
-        currSet->at(this->tag)->valid) {
+    // hit happens when tag is found plus its valid bit is 1
+    if ((this->cache.at(this->index).find(this->tag) !=
+         this->cache.at(this->index).end()) &&
+        this->cache.at(this->index).at(this->tag).valid) {
+
+      // set isHit flag to true
       this->isHit = true;
+
+      // add hit counter depending on whether is load or store
       if (traceLine->getLS() == 0) {  // load
         this->setLoadHits(this->getLoadHits() + 1);
+        // set dirty bit on store hit
+        this->cache.at(this->index).at(this->tag).dirtyBit = true;
       } else {  // store
         this->setStoreHits(this->getStoreHits() + 1);
-        currSet->at(this->tag)->dirtyBit = 1;
+
       }
-    } else {  // miss
-      // this->isHit = false;
+    } else { // miss
+      // this->isHit = false; // this has been already done
+
+      // add miss penalty
       this->setSimResults(this->getSimResults() + this->getMissPenalty());
-      if (traceLine->getLS() == 0) {
+
+      // add miss counter depending on whether is load or store
+      if (traceLine->getLS() == 0) { // load
         this->setLoadMisses(this->getLoadMisses() + 1);
-      } else {
+      } else { // store
         this->setStoreMisses(this->getStoreMisses() + 1);
       }
     }
 
     // replacement policy processing
     this->access(traceLine);
-    if (i % 10000 == 0) {
+
+    // progress indicator
+    if (i % 50000 == 0) {
       std::cout << "\r" << std::to_string(i) << " lineas procesadas";
       std::cout.flush();
     }
-    // if (i == 50000) break;
+    //if (i == 90000) break;
   } while (tfr->nextLine());
+
   std::cout << "\r" << std::to_string(i) << " lineas procesadas";
   std::cout << std::endl;
 
+
+  // Set total misses/hits based on ld/st hits/misses
   this->setTotalHits(this->getLoadHits() + this->getStoreHits());
   this->setTotalMisses(this->getLoadMisses() + this->getStoreMisses());
 
@@ -148,24 +181,24 @@ void Cache::initCache() {
   // first dimension is the set
   // second dimension is the line
   // value is the tag
-  this->cache = new std::vector<std::unordered_map<long int, CacheInfo*>*>();
+  this->cache = std::vector<std::unordered_map<long int, CacheInfo>>();
   this->cacheLines =
-      this->getSize() * 1024 / this->getBlockSize() / this->getAssociativity();
+      (this->getSize() << 10) / this->getBlockSize() / this->getAssociativity();
 
   // make sure no tags are repeated
   int tagCounter;
 
   for (size_t i = 0; i < this->getAssociativity(); i++) {
-    this->cache->push_back(new std::unordered_map<long int, CacheInfo*>());
+    this->cache.push_back(std::unordered_map<long int, CacheInfo>());
     tagCounter = 0;
     for (size_t j = 0; j < this->cacheLines; j++) {
-      this->cache->at(i)->insert({tagCounter++, new CacheInfo(0, 0)});
+      this->cache.at(i).insert({tagCounter++, CacheInfo(false, false)}); // unique tag, not valid, not dirty
     }
   }
 }
 
 void Cache::mapAddress(TraceLine* traceLine) {
-  this->offset = (this->offsetMask & traceLine->getDireccion());
+  // this->offset = (this->offsetMask & traceLine->getDireccion()); // this is neer used
   this->index =
       (this->indexMask & traceLine->getDireccion()) >> this->offsetBits;
   this->tag = (this->tagMask & traceLine->getDireccion()) >>

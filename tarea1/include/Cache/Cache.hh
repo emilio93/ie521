@@ -237,7 +237,7 @@ class Cache {
    * access as this->cache->at(setNo)->at(lineNo)
    *
    */
-  std::vector<std::unordered_map<long int, CacheInfo*>*>* cache;
+  std::vector<std::unordered_map<long int, CacheInfo>> cache;
 
   /**
    * @brief Construct a new Cache object
@@ -257,7 +257,7 @@ class Cache {
    * @brief Destroy the Cache object
    *
    */
-  ~Cache() { ; }
+  ~Cache();
 
   /**
    * @breif Runs the tests on the cache with the given parameters and assign
