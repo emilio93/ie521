@@ -21,6 +21,12 @@ std::string cliOptionToString(CliOption opt) {
     case TRACE_FILENAME:
       option = "-f";
       break;
+    case CYCLE_MUL:
+      option = "-c";
+      break;
+    case CSV_PRINT:
+      option = "-print-csv";
+      break;
     default:
       option = "";
   }
@@ -41,6 +47,10 @@ CliOption stringToCliOption(std::string option) {
     opt = MISS_PENALTY;
   } else if (option.compare("-f") == 0) {
     opt = TRACE_FILENAME;
+  } else if (option.compare("-c") == 0) {
+    opt = CYCLE_MUL;
+  } else if (option.compare("-f") == 0) {
+    opt = CSV_PRINT;
   } else {
     opt = NO_OPTION;
   }
@@ -59,6 +69,8 @@ bool isRequired(CliOption opt) {
       isRequired = true;
       break;
     case TRACE_FILENAME:
+    case CYCLE_MUL:
+    case CSV_PRINT:
       isRequired = false;
     default:
       isRequired = false;
@@ -72,8 +84,10 @@ bool checkOptionValue(CliOption opt, std::string value) {
     return true;
   }
   if (opt == TAMANO_CACHE || opt == TAMANO_LINEA || opt == ASOCIATIVIDAD ||
-      opt == MISS_PENALTY) {
+      opt == MISS_PENALTY || opt == CSV_PRINT) {
     return Util::isInt(value);
+  } else if (opt == CYCLE_MUL) {
+    return Util::isFloat(value);
   } else if (opt == POLITICA_REMPLAZO) {
     return value.compare("LRU") == 0 || value.compare("NRU") == 0 ||
            value.compare("SRRIP") == 0 || value.compare("random") == 0;

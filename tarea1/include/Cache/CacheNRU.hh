@@ -40,7 +40,7 @@ class CacheNRU : public Cache {
   explicit CacheNRU(unsigned int size, unsigned int associativity,
                     unsigned int blockSize, CacheRP cacheRP,
                     unsigned int missPenalty, TraceFile* tfr);
-
+  //! Single memory access implemented to satisfy nru rp.
   void access(TraceLine* traceLine);
 };
 

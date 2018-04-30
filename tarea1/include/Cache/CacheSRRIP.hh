@@ -10,6 +10,10 @@
 #include "Cache/Cache.hh"
 #include "TraceFile/TraceFile.hh"
 
+/**
+ * @brief Node in the list of current cache elements maps rrpv with tag.
+ *
+ */
 struct SRRIPNode {
   long int tag;
   int rrpv;
@@ -23,6 +27,10 @@ typedef std::list<SRRIPNode> SRRIPList;
 
 typedef std::unordered_map<long int, SRRIPList::iterator> SRRIPMap;
 
+/**
+ * @brief SRRIP Cache replacement policy definition.
+ *
+ */
 class CacheSRRIP : public Cache {
   private:
 
@@ -32,8 +40,10 @@ class CacheSRRIP : public Cache {
   // maps the srrip List for fast access maps the srrip list to the cache
   std::vector<SRRIPMap> srripMap;
 
+  // m value for this policy
   static const int RRPV_MAX = 3;
 
+  // checks if SRRIPNode's rrpv is max
   static bool isRrpvMax(const SRRIPNode& srripNode);
 
  public:
@@ -42,6 +52,7 @@ class CacheSRRIP : public Cache {
                     unsigned int blockSize, CacheRP cacheRP,
                     unsigned int missPenalty, TraceFile* tfr);
 
+  //! Single memory access implemented to satisfy srrip rp.
   void access(TraceLine* traceLine);
 };
 
