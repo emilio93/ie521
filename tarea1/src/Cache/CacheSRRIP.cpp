@@ -58,7 +58,7 @@ void CacheSRRIP::access(TraceLine* traceLine) {
     it->rrpv = CacheSRRIP::RRPV_MAX - 1;
     it->tag = this->tag;
     this->srripMap.at(this->index).insert_or_assign(this->tag, it);
-    this->cache.at(this->index).insert_or_assign(this->tag, CacheInfo(0, 1));
+    this->cache.at(this->index).insert_or_assign(this->tag, CacheInfo(traceLine->getLS() == 0 ? 0 : 1, 1));
   }
 };
 

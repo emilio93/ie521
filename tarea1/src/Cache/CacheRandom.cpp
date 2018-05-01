@@ -17,6 +17,6 @@ void CacheRandom::access(TraceLine* traceLine){
       // here the cache should write to main memory
     }
     this->cache.at(this->index).erase(random_it);
-    this->cache.at(this->index).insert_or_assign(this->tag, CacheInfo(0, 1));
+    this->cache.at(this->index).insert_or_assign(this->tag, CacheInfo(traceLine->getLS() == 0 ? 0 : 1, 1));
   }
 };

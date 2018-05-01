@@ -58,7 +58,7 @@ void CacheLRU::access(TraceLine* traceLine) {
     // map the element
     this->lruMap.at(this->index)
         .insert_or_assign(this->tag, this->lruList.at(this->index).begin());
-    // insert element to cache, not dirty, valid
-    this->cache.at(this->index).insert_or_assign(this->tag, CacheInfo(0, 1));
+    // insert element to cache
+    this->cache.at(this->index).insert_or_assign(this->tag, CacheInfo(traceLine->getLS() == 0 ? 1 : 0, 1));
   }
 };

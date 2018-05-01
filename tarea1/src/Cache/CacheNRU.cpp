@@ -73,7 +73,7 @@ void CacheNRU::access(TraceLine* traceLine) {
       this->nruList.at(this->index).push_front(NruNode(this->tag, 0));
       this->nruMap.at(this->index)
           .insert_or_assign(this->tag, this->nruList.at(this->index).begin());
-      this->cache.at(this->index).insert_or_assign(this->tag, CacheInfo(0, 1));
+      this->cache.at(this->index).insert_or_assign(this->tag, CacheInfo(traceLine->getLS() == 0 ? 01 : 1, 1));
     }
   }
 };

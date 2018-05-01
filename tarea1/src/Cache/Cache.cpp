@@ -121,10 +121,10 @@ void Cache::simulate() {
 
       // add hit counter depending on whether is load or store
       if (traceLine->getLS() == 0) {  // load
-        // set dirty bit on store hit
-        this->cache.at(this->index).find(this->tag)->second.dirtyBit = true;
         this->setLoadHits(this->getLoadHits() + 1);
       } else {  // store
+        // set dirty bit on store hit
+        this->cache.at(this->index).find(this->tag)->second.dirtyBit = true;
         this->setStoreHits(this->getStoreHits() + 1);
       }
     } else {  // miss
@@ -148,7 +148,6 @@ void Cache::simulate() {
       std::cout << "\r" << std::to_string(i) << " lineas procesadas";
       std::cout.flush();
     }
-    // if (i == 90000) break;
   } while (tfr->nextLine());
 
   std::cout << "\r" << std::to_string(i) << " lineas procesadas";
