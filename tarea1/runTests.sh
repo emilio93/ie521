@@ -95,3 +95,8 @@ for trace in ./data/*.gz; do
     done
 
 done
+
+# Create a back up of the results
+# as results file might be modified
+today=`date +%Y-%m-%d.%H:%M:%S`
+cp results.csv results.${today}.csv
