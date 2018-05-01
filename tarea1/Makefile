@@ -24,7 +24,8 @@ OBJECTS = $(SOURCES:$(SRC_PATH)/%.$(SRC_EXT)=$(BUILD_PATH)/%.o)
 DEPS = $(OBJECTS:.o=.d)
 
 # flags #
-COMPILE_FLAGS = -std=c++17 -Wall -g -Wextra -ggdb3 -no-pie -pg
+# COMPILE_FLAGS = -std=c++17 -Wall -g -Wextra -ggdb3 -no-pie -pg
+COMPILE_FLAGS = -std=c++17
 INCLUDES = -Iinclude/ -Iinclude/Cache -I/usr/local/include
 # Space-separated pkg-config libraries used by this project
 LIBS = -lboost_iostreams -lz
